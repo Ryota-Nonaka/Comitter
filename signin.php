@@ -77,17 +77,24 @@ if (isset($_POST['email']) && ($_POST['password'])) {
           <span class="input-group-addon addon-facebook">
             <i class="fa fa-fw fa-2x fa-facebook fa-fw"></i>
           </span>
-          <a class="btn btn-lg btn-block btn-facebook" href="#">
+          <a class="btn btn-lg btn-block btn-facebook" id="twitter-button" href="#">
             Facebookアカウントでログイン</a>
         </div>
 
-        <div class="input-group">
+        <!-- <div class="input-group" id="twitter-button" data-provider="twitter">
           <span class="input-group-addon addon-twitter">
             <i class="fa fa-fw fa-2x fa-twitter fa-fw"></i>
           </span>
           <a class="btn btn-lg btn-block btn-twitter" href="#">
             Twitterアカウントでログイン</a>
-        </div>
+        </div> -->
+        <button id="twitter-button" class="btn btn-block btn-default" style="text-align: left" data-provider="twitter">
+          <span style="display: block; margin-left: 10px">
+            <img src="https://oauth.io/api/providers/twitter/logo" width="32" height="32" class="pull-left">
+            <span style="display: block; margin-left: 43px; position: relative; top: -15px">Connect with Twitter</span>
+          </span>
+        </button>
+
 
         <form role="form" action="signin.php" method="post">
           <div class="divider-form"></div>
@@ -126,6 +133,17 @@ if (isset($_POST['email']) && ($_POST['password'])) {
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  <script>
+    $('twitter-button'), on('click', function() {
+
+      OAuth.initialize('43YtvM-gQdjJtAg_h78waYSEDYM');
+      OAuth.popup('twitter', function(error, success) {
+        console.log(error);
+        console.log(success);
+        //結果を使って何かをします
+      });
+    })
+  </script>
 </body>
 
 </html>
