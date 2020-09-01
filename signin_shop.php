@@ -1,15 +1,13 @@
 <?php
-require 'Db.php';
+require 'config.php';
 
-session_start();
-
-if (isset($_POST['email']) && ($_POST['password'])) {
+if (isset($_POST['shop_email']) && ($_POST['shop_password'])) {
 
   try {
     $db = new Db();
     $pdo = $db->dbConnect();
-    $stmt = $pdo->prepare('select * from userdata where email = ?');
-    $stmt->execute(array($_POST['email']));
+    $stmt = $pdo->prepare('select * from shop_userdata where shop_email = ?');
+    $stmt->execute(array($_POST['shop_email']));
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
   } catch (\Exception $e) {
     echo $e->getMessage() . PHP_EOL;
@@ -17,15 +15,16 @@ if (isset($_POST['email']) && ($_POST['password'])) {
 
 
   //emailがDB内に存在しているか確認
-  if (!isset($row['email'])) {
+  if (!isset($row['shop_email'])) {
     echo 'メールアドレス又はパスワードが間違っています。';
     echo '<a href="index.php" class="badge badge-primary">トップページへ戻る</a>';
     return false;
   }
   //パスワード確認後sessionにメールアドレスを渡す
-  if (password_verify($_POST['password'], $row['pass'])) {
+  if (password_verify($_POST['shop_password'], $row['shop_password'])) {
     session_regenerate_id(true); //session_idを新しく生成し、置き換える
-    $_SESSION['login'] = $row['username'];
+    $_SESSION['login_shop'] = $row['shop_name'];
+    $_SESSION['login_shop_id'] = $row['id'];
     header('Location:index.php');
     exit;
   } else {
@@ -81,33 +80,28 @@ if (isset($_POST['email']) && ($_POST['password'])) {
             Facebookアカウントでログイン</a>
         </div>
 
-        <!-- <div class="input-group" id="twitter-button" data-provider="twitter">
+        <div class="input-group" id="twitter-button" data-provider="twitter">
           <span class="input-group-addon addon-twitter">
             <i class="fa fa-fw fa-2x fa-twitter fa-fw"></i>
           </span>
-          <a class="btn btn-lg btn-block btn-twitter" href="#">
+          <a class="btn btn-lg btn-block btn-twitter" href="login.php">
             Twitterアカウントでログイン</a>
-        </div> -->
-        <button id="twitter-button" class="btn btn-block btn-default" style="text-align: left" data-provider="twitter">
-          <span style="display: block; margin-left: 10px">
-            <img src="https://oauth.io/api/providers/twitter/logo" width="32" height="32" class="pull-left">
-            <span style="display: block; margin-left: 43px; position: relative; top: -15px">Connect with Twitter</span>
-          </span>
-        </button>
+        </div>
 
 
-        <form role="form" action="signin.php" method="post">
+
+        <form role="form" action="signin_shop.php" method="post">
           <div class="divider-form"></div>
           <div class="form-group">
             <label for="email">メールアドレス</label>
-            <input name="email" type="email" class="form-control" id="email" placeholder="メールアドレスを入力してください" required>
+            <input name="shop_email" type="email" class="form-control" id="email" placeholder="メールアドレスを入力してください" required>
           </div>
 
           <div class="divider-form"></div>
 
           <div class="form-group">
             <label for="exampleInputPassword1">パスワード</label>
-            <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="パスワードを入力してください" required />
+            <input name="shop_password" type="password" class="form-control" id="exampleInputPassword1" placeholder="パスワードを入力してください" required />
           </div>
 
           <div class="divider-form"></div>
@@ -121,7 +115,7 @@ if (isset($_POST['email']) && ($_POST['password'])) {
           </button>
 
           <p class="text-center">
-            アカウントをお持ちでない方は <a href="new account.php">新しくアカウントを作成する</a>
+            アカウントをお持ちでない方は <a href="new_account_shop.php">新しくアカウントを作成する</a>
           </p>
         </form>
       </div>
@@ -130,17 +124,6 @@ if (isset($_POST['email']) && ($_POST['password'])) {
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script>
-    $('twitter-button'), on('click', function() {
-
-      OAuth.initialize('mliv2TvmcNdH6U7XttmGCQwsW');
-      OAuth.popup('twitter', function(error, success) {
-        console.log(error);
-        console.log(success);
-        //結果を使って何かをします
-      });
-    })
-  </script>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>

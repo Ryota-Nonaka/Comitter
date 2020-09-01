@@ -1,7 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/config.php');
 
-session_start();
 
 //同じメールアドレスが使われていたらエラーを出したい
 
@@ -10,7 +10,7 @@ $errorMessage = "";
 $signUpMessage = "";
 //エラーカウントの変数を書く
 //条件式の中にエラーカウントを足していき最後にエラーカウント0ならば認証処理する。
-if (isset($_POST['signUp'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (empty($_POST['username'])) {
     $errorMessage = 'ユーザーIDが未入力です。';
   } else if (empty($_POST['email'])) {
@@ -24,19 +24,20 @@ if (isset($_POST['signUp'])) {
   } else if (empty($_POST['addr01'])) {
     $errorMessage = '住所を入力してください。';
   }
-  if (!empty($_POST['username']) && !empty($_POST['email']) && !empty($_POST['pass']) && !empty($_POST['zip01']) && !empty($_POST['pref01']) && !empty($_POST['addr01'])) {
+  if (!empty($_POST['username']) && !empty($_POST['email']) && !empty($_POST['pass']) && !empty($_POST['zip']) && !empty($_POST['pref']) && !empty($_POST['addr'])) {
 
     $user = $_POST['username'];
     $mail = $_POST['email'];
     $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
-    $ad01 = $_POST['zip01'];
-    $ad02 = $_POST['pref01'];
-    $ad03 = $_POST['addr01'];
-    $text = $_POST['text'];
+    $ad01 = $_POST['zip'];
+    $ad02 = $_POST['pref'];
+    $ad03 = $_POST['addr'];
+    $introduction = $_POST['introduction'];
+    $sex = $_POST['sex'];
+    $age = $_POST['age'];
 
 
 
-    $dsn = sprintf('mysql:dbname=loginmanagement;host=127.0.0.1;charset=utf8mb4', 'user', "baramo0814");
 
     if (!$mail = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
       echo '正しいメールアドレスを入力してください。';
@@ -52,22 +53,20 @@ if (isset($_POST['signUp'])) {
     // エラー処理
     try {
       //データベース処理のクラス化
-      $pdo = new PDO('mysql:dbname=loginmanagement;127.0.0.1;charset=utf8mb4', 'user', "baramo0814", [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-      ]);
-
-      $stmt = $pdo->prepare("INSERT INTO userdata(username,email,pass,zip01,pref01,addr01,text) VALUES (:username, :email, :pass, :zip01, :pref01, :addr01,  :text)");
+      $db = new Db();
+      $pdo = $db->dbConnect();
+      $stmt = $pdo->prepare("INSERT INTO userdata(username,email,pass,zip,pref,addr,introduction, sex,age) VALUES (:username, :email, :pass, :zip, :pref, :addr,  :introduction, :sex, :age)");
       $stmt->bindParam(':username', $user, PDO::PARAM_STR);
       $stmt->bindParam(':email', $mail, PDO::PARAM_STR);
       $stmt->bindParam(':pass', $pass, PDO::PARAM_STR);
-      $stmt->bindParam(':zip01', $ad01, PDO::PARAM_STR);
-      $stmt->bindParam(':pref01', $ad02, PDO::PARAM_STR);
-      $stmt->bindParam(':addr01', $ad03, PDO::PARAM_STR);
-      $stmt->bindParam(':text', $text, PDO::PARAM_STR);
+      $stmt->bindParam(':zip', $ad01, PDO::PARAM_STR);
+      $stmt->bindParam(':pref', $ad02, PDO::PARAM_STR);
+      $stmt->bindParam(':addr', $ad03, PDO::PARAM_STR);
+      $stmt->bindParam(':introduction', $introduction, PDO::PARAM_STR);
+      $stmt->bindParam(':sex', $sex, PDO::PARAM_STR);
+      $stmt->bindParam(':age', $age, PDO::PARAM_STR);
 
-      $_SESSION['loginuser'] = $row['username'];
-      header('Location:created_account.php');
+
       $stmt->execute();
       $userid = $pdo->lastinsertid();
     } catch (PDOException $e) {
@@ -95,14 +94,12 @@ if (isset($_POST['signUp'])) {
 
   <!--自作CSS -->
   <style type="text/css">
-    <!--
     /*ここに調整CSS記述*/
-    -->
   </style>
 </head>
 
 <body>
-  <header>
+  <!-- <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">TRY-GER</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,20 +116,19 @@ if (isset($_POST['signUp'])) {
         </ul>
         <form class="form-inline mt-2 mt-md-0">
 
-          /*
           <!-- 切り替えボタンの設定 -->
 
 
-        </form> */
+  <!-- </form>
 
       </div>
     </nav>
 
-  </header>
+  </header> -->
 
-  /*
+
   <!-- モーダルの設定 -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -149,17 +145,17 @@ if (isset($_POST['signUp'])) {
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
             </button>
-            <!-- <button type="button" class="btn btn-primary">変更を保存</button> -->
-          </div><!-- /.modal-footer -->
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog --> */
+            
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Page Content -->
 
   <div class="container mt-5 p-lg-5 bg-light">
-    <form class="needs-validation" novalidate action="./new account.php" method="post">
+    <form class="needs-validation" novalidate action="new_account_user.php" enctype="multipart/form-data" method="post">
       <fieldset>
         <legend>新規登録フォーム</legend>
         <div>
@@ -168,6 +164,7 @@ if (isset($_POST['signUp'])) {
         <div>
           <font color="#0000ff"><?php echo htmlspecialchars($signUpMessage, ENT_QUOTES); ?></font>
         </div>
+
         <!--ユーザー名-->
         <div class="mb-8">
           <div class="form-group row">
@@ -209,36 +206,56 @@ if (isset($_POST['signUp'])) {
         <div class="form-row">
           <div class="col-md-3 mb-5">
             <label for="inputAddress01">郵便番号(7桁)</label>
-            <input type="text" name="zip01" maxlength="8" onKeyUp="AjaxZip3.zip2addr(this,'','pref01','addr01');" class="form-control" id="inputAddress01" placeholder="1030013" value="<?php if (!empty($_POST["zip01"])) {
-                                                                                                                                                                                          echo htmlspecialchars($_POST["zip01"], ENT_QUOTES);
-                                                                                                                                                                                        } ?>">
+            <input type="text" name="zip" maxlength="8" onKeyUp="AjaxZip3.zip2addr(this,'','pref','addr');" class="form-control" id="inputAddress01" placeholder="1030013" value="<?php if (!empty($_POST["zip"])) {
+                                                                                                                                                                                    echo htmlspecialchars($_POST["zip"], ENT_QUOTES);
+                                                                                                                                                                                  } ?>">
 
           </div>
           <div class="col-md-3">
             <label for="inputAddress02">都道府県</label>
-            <input type="text" name="pref01" id="inputAddress02" class="form-control" placeholder="東京都" value="<?php if (!empty($_POST["pref01"])) {
-                                                                                                                  echo htmlspecialchars($_POST["pref01"], ENT_QUOTES);
-                                                                                                                } ?>">
+            <input type="text" name="pref" id="inputAddress02" class="form-control" placeholder="東京都" value="<?php if (!empty($_POST["pref"])) {
+                                                                                                                echo htmlspecialchars($_POST["pref"], ENT_QUOTES);
+                                                                                                              } ?>">
 
           </div>
           <div class="col-md-6">
             <label for="inputAddress03">住所</label>
-            <input type="text" name="addr01" class="form-control" id="inputAddress03" placeholder="中央区日本橋人形町" value="<?php if (!empty($_POST["addr01"])) {
-                                                                                                                        echo htmlspecialchars($_POST["addr01"], ENT_QUOTES);
-                                                                                                                      } ?>">
+            <input type="text" name="addr" class="form-control" id="inputAddress03" placeholder="中央区日本橋人形町" value="<?php if (!empty($_POST["addr"])) {
+                                                                                                                      echo htmlspecialchars($_POST["addr"], ENT_QUOTES);
+                                                                                                                    } ?>">
 
           </div>
         </div>
         <!--/住所-->
 
-        <!--備考欄-->
+        <!--性別-->
+        <div class="custom-control custom-radio ">
+          <input type="checkbox" class="custom-control-input" name="sex" id="custom-radio-1" value="男性">
+          <label class="custom-control-label" for="custom-radio-1">男性 </label>
+        </div>
+        <div class="custom-control custom-radio ">
+          <input type="checkbox" class="custom-control-input" name="sex" id="custom-radio-1" value="女性">
+          <label class="custom-control-label" for="custom-radio-1">女性 </label>
+        </div>
+        <!--/性別-->
+
+        <!-- 年齢 -->
+        <select name="age">
+          <?php for ($i = 0; $i < 100; $i += 1) {
+            echo '<option value=' . $i . '>' . $i . '</option>';
+          } ?>
+        </select>　歳
+        <!-- 年齢 -->
+
+
+        <!--自己紹介欄-->
         <div class="form-group pb-3">
           <label for="Textarea">備考欄</label>
-          <textarea class="form-control" id="Textarea" name="text" rows="3" placeholder="その他、質問などありましたら" value="<?php if (!empty($_POST["text"])) {
-                                                                                                                  echo htmlspecialchars($_POST["text"], ENT_QUOTES);
-                                                                                                                } ?>"></textarea>
+          <textarea class="form-control" id="Textarea" name="introduction" rows="3" placeholder="自分のキャラクターや自己PRを記入してください。" value="<?php if (!empty($_POST["text"])) {
+                                                                                                                                    echo htmlspecialchars($_POST["text"], ENT_QUOTES);
+                                                                                                                                  } ?>"></textarea>
         </div>
-        <!--/備考欄-->
+        <!--/自己紹介欄-->
 
         <!--利用規約-->
         <div class="form-group pb-3">
@@ -258,15 +275,16 @@ if (isset($_POST['signUp'])) {
 
         <div class="form-group row">
           <div class="col-sm-12">
-            <button type="submit" class="btn btn-primary btn-block" name="signUp" value="新規登録">
+            <button type="submit" class="btn btn-primary btn-block" name="submit" value="新規登録">
               新規登録
             </button>
           </div>
         </div>
         <!--/ボタンブロック-->
     </form>
+
   </div>
-  <!-- /container -->
+  <!--/container -->
   </fieldset>
 
   <!-- Optional JavaScript -->
@@ -278,6 +296,27 @@ if (isset($_POST['signUp'])) {
 
   <!-- 郵便番号から住所自動入力 -->
   <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+  <script>
+    var fileArea = document.getElementById('drag-drop-area');
+    var fileInput = document.getElementById('fileInput');
+
+
+    fileArea.addEventListener('dragover', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.add('dragover');
+    });
+
+    fileArea.addEventListener('dragleave', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.remove('dragover');
+    });
+    fileArea.addEventListener('drop', function(evt) {
+      evt.preventDefault();
+      fileArea.classList.remove('dragenter');
+      var files = evt.dataTransfer.files;
+      fileInput.files = files;
+    });
+  </script>
 </body>
 
 </html>

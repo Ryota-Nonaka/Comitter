@@ -1,11 +1,83 @@
+<?php
+
+require_once(__DIR__ . '/config.php');
+ini_set('display_errors', 1);
+
+
+
+$twitterLogin = new MyApp\TwitterLogin();
+
+if ($twitterLogin->isLoggedIn()) {
+  $me = $_SESSION['me'];
+
+  $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
+  $userInfo = $twitter->getProfile();
+
+
+  MyApp\Token::create();
+}
+//リンククエリ
+$db = new Db();
+$pdo = $db->dbConnect();
+$result = array();
+if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
+  $name_search = htmlspecialchars($_GET['job_name']);
+  $name_search_value = $name_search;
+  $location_search = htmlspecialchars($_GET['job_location']);
+  $location_search_value = $location_search;
+
+  $sql = "SELECT * FROM job where job_title LIKE '%$name_search%' AND location  LIKE '%$location_search%' ";
+
+  $stmt = $pdo->query($sql);
+  foreach ($stmt as $row) {
+    array_push($result, $row);
+  }
+} else if (!isset($_GET['job_name']) && isset($_GET['job_location'])) {
+  $name_search = '';
+  $name_search_value = $name_search;
+  $location_search = htmlspecialchars($_GET['job_location']);
+  $location_search_value = $location_search;
+
+  $sql = "SELECT * FROM job where location  LIKE '%$location_search%' ";
+
+  $stmt = $pdo->query($sql);
+  foreach ($stmt as $row) {
+    array_push($result, $row);
+  }
+} else if (isset($_GET['job_name']) && !isset($_GET['job_location'])) {
+  $name_search = htmlspecialchars($_GET['job_name']);
+  $name_search_value = $name_search;
+  $location_search = '';
+  $location_search_value = $location_search;
+  $sql = "SELECT * FROM job where job_title LIKE '%$name_search%' ";
+  $stmt = $pdo->query($sql);
+  foreach ($stmt as $row) {
+    array_push($result, $row);
+  }
+} else {
+  $name_search = '';
+  $name_search_value = $name_search;
+  $location_search = '';
+  $location_search_value = $location_search;
+
+  $sql = "SELECT * FROM job";
+  $result = array();
+  $stmt = $pdo->query($sql);
+  foreach ($stmt as $row) {
+    array_push($result, $row);
+  }
+}
+
+
+
+
+
+
+
+
+?>
 <!doctype html>
 <html lang="ja">
-<!-- 独自ロジックの開発
-twitterからはフォロワー数
-youtubeからは登録者数
-各SNSから人気の指標になる数字を織り込めるようにする
-(アカウントと紐づける、API)
-アカウント数に応じた募集を表示できるようにする。 -->
 
 <head>
   <!-- Required meta tags -->
@@ -41,18 +113,25 @@ youtubeからは登録者数
 
           <!-- 切り替えボタンの設定 -->
           <?php
-          session_start();
 
-          if (isset($_SESSION['loginuser'])) :?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['loginuser'] ?> </span>さん！</div>
-            <a href='logout.php'>ログアウトはこちら。</a>
-            <?php
-            elseif (isset($_SESSION['loginshop'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['loginshop'] ?> </span>さん！</div>
-            <a href='logout.php'>ログアウトはこちら。</a>
+
+          if (isset($_SESSION['login'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+            <a href='mypage_user.php'>マイページへ</a>
+          <?php elseif (isset($_SESSION['me'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
+            <a href='mypage_user.php'>マイページへ</a>
+          <?php elseif (isset($_SESSION['login_shop'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
+            <a href='mypage_shop.php'>マイページへ</a>
           <?php else : ?>
-            <button type="button" class="btn btn-primary text-right" data-toggle="modal" data-target="#exampleModal">ログイン</button>
+            <a href='signin_user.php'>ユーザーログインはこちら</a>
+            <a href='signin_shop.php'>店舗会員ログインはこちら</a>
           <?php endif; ?>
+
+
+
+
 
 
         </form>
@@ -143,20 +222,23 @@ youtubeからは登録者数
     <!-- Wrap the rest of the page in another container to center all the content. -->
 
     <div class="container marketing"></div>
-    <form>
-      <class class="form-row">
-        <p class="text-left text-secondary">エリア・店名・期間で検索</ｐ>
-          <div class="col-sm-auto">
-            <input type="text" class="form-control" placeholder="地域">
+    <form method="get" action="result.php">
+      <div class="form-row">
+        <p class="text-left text-secondary">エリア・年齢・期間で検索</ｐ>
+          <!-- <div class="col-sm-auto">
+            <input type="text" class="form-control" placeholder="年齢" name="age">
+          </div> -->
+          <div class="col-sm-XX">
+            <input type="text" class="form-control" placeholder="店名" name="job_name" id="job_name" value="<?php echo $name_search_value ?>">
           </div>
           <div class="col-sm-XX">
-            <input type="text" class="form-control" placeholder="店名">
+            <input type="text" class="form-control" placeholder="エリア" name="job_location" id="job_location" value="<?php echo $location_search_value ?>">
           </div>
-          <div class="col-sm-XX">
-            <input type="text" id="datepicker" class="form-control" placeholder="期間">
-          </div>
-          <a class="btn btn-lg btn-primary nav-link" href="info.php" role="button">検索</a>
-      </class>
+          <!-- <div class=" col-sm-XX">
+            <input type="text" id="datepicker" class="form-control" placeholder="期間" name="search3">
+          </div> -->
+          <input type="submit" name="" value="検索">
+      </div>
     </form>
     <!-- Three columns of text below the carousel -->
     </br>

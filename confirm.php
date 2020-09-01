@@ -14,9 +14,6 @@
 
 
 
-$dsn = 'mysql:dbname=confirm;host=localhost';
-$user = 'user';
-$pass = "baramo0814";
 // フォームのボタンが押されたら
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // フォームから送信されたデータを各変数に格納
@@ -32,10 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 if (isset($_POST["submit"])) {
     try {
-        $pdo = new PDO($dsn, $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+        $db = new Db();
+        $pdo = $db->dbConnect();
 
         $stmt = $pdo->prepare("INSERT INTO confirm(name,furigana,email,tel,sex,item,content) VALUES (:name,:furigana,:email,:tel,:sex,:item,:content)");
         $stmt->bindParam(':name', $name, PDO::PARAM_STR);
@@ -314,12 +309,12 @@ if (isset($_POST["submit"])) {
         <input class="btn btn-primary" type="button" value="内容を修正する" onclick="history.back(-1)">
         <button class="btn btn-primary" type="submit" name="submit">送信する</button>
     </form>
-    
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 </body>
 
 </html>
