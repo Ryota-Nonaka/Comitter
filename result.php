@@ -195,7 +195,7 @@ $to = $offset + COMMENTS_PER_PAGE < $total ? ($offset + COMMENTS_PER_PAGE)
 
     <?php foreach ($results as $result) : ?>
       <li class="media">
-        <img width="64" height="64" src="<?php echo $result['job_img_path']; ?>" />
+        <img width="64" height="64" src="<?php echo $result['job_img_path']; ?>">
 
         <div class="media-body mt-3">
           <a class="mt-0 mb-1 font-weight-bold" href="job_contents.php?id=<?php echo $result['job_id']; ?>"><?php echo htmlspecialchars($result['job_title'], ENT_QUOTES, 'UTF-8'); ?></a>

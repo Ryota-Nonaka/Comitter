@@ -2,18 +2,23 @@
 
 require_once(__DIR__ . '/config.php');
 
-if (isset($_SESSION['login'])) {
+if (isset($_SESSION['login_shop'])) {
   try {
     $db = new Db();
     $pdo = $db->dbConnect();
-    $id = $_SESSION['id'];
-    $sql = "SELECT * FROM userdata WHERE id='$id'";
+    $id = $_SESSION['login_shop_id'];
+    $sql = "SELECT * FROM shop_userdata WHERE id='$id'";
     $stmt = $pdo->query($sql);
     foreach ($stmt as $row) {
-      $username = $row['username'];
-      $Location = $row['pref01'];
-      $introduction = $row['introduction'];
-      $profile_img = $row['img_path'];
+      $username = $row['shop_name'];
+      $location = $row['shop_pref'];
+      $open = $row['business_hour_open'];
+      $close = $row['business_hour_close'];
+      $regular_holiday = $row['regular_holiday'];
+      $shop_img1 = $row['shop_img1'];
+      $shop_img1 = $row['shop_img1'];
+      $shop_img1 = $row['shop_img1'];
+      $shop_url = $row['shop_url'];
     }
   } catch (\Exception $e) {
     echo $e->getMessage() . PHP_EOL;
@@ -22,27 +27,34 @@ if (isset($_SESSION['login'])) {
 
 
 
+try {
+  $db = new Db();
+  $pdo = $db->dbConnect();
+  $sql = "SELECT * from job where shop_id='$id'";
 
-$twitterLogin = new MyApp\TwitterLogin();
+  $jobs_info = array();
+  $stmt = $pdo->query($sql);
 
-if ($twitterLogin->isLoggedIn()) {
-  $me = $_SESSION['me'];
-  $token = $_SESSION['token'];
-  $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
-
-  $tweets = $twitter->getTweets();
-  $userInfo = $twitter->getProfile();
+  foreach ($stmt as $row) {
+    array_push($jobs_info, $row);
+    // var_dump($job_info);
 
 
-  MyApp\Token::create();
+
+
+  }
+} catch (PDOException $e) {
+  $errorMessage = 'データベースエラー';
+  echo $e->getMessage();
 }
+
 
 
 ?>
 <!doctype html>
 <html lang="ja">
-案件情報の期限、詳細などを載せるようにする
-レコメンド機能をつける
+
+
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -55,7 +67,7 @@ if ($twitterLogin->isLoggedIn()) {
 </head>
 
 <body>
-  <header>
+  <!-- <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">食バズ(仮)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,29 +82,26 @@ if ($twitterLogin->isLoggedIn()) {
             <a class="nav-link" href="confirm_input.php">お問い合わせ</a>
           </li>
         </ul>
-        <form class="form-inline mt-2 mt-md-0"> -->
+        <form class="form-inline mt-2 mt-md-0">
 
           <!-- 切り替えボタンの設定 -->
-          <?php
+  <?php
 
 
-          if (isset($_SESSION['login'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
-            <a href='mypage.php'>マイページへ</a>
-          <?php elseif (isset($_SESSION['me'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
-            <a href='mypage.php'>マイページへ</a>
-          <?php endif; ?>
+  if (isset($_SESSION['login_shop'])) : ?>
+    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
+    <a href='mypage.php'>マイページへ</a>
+
+  <?php endif; ?>
 
 
 
-        </form>
+  </form>
 
-      </div>
-    </nav>
+  </div>
+  </nav>
 
-  </header> -->
-
+  </header>
   <!-- モーダルの設定 -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog">
@@ -127,14 +136,14 @@ if ($twitterLogin->isLoggedIn()) {
       <a class="btn btn-primary" href="job_input.php" role="button">依頼を投稿する</a>
     </div>
     <h1>proflile</h1>
-    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php if (isset($_SESSION['login'])) {
-                                                                echo h($profile_img);
+    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php if (isset($_SESSION['login_shop'])) {
+                                                                echo h($shop_img1);
                                                               } ?>" width="100px">
     <div class="row">
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Username</h3>
-          <p> <?php if (isset($_SESSION['login'])) {
+          <p> <?php if (isset($_SESSION['login_shop'])) {
                 echo  $username;
               }  ?></p>
         </div>
@@ -142,55 +151,64 @@ if ($twitterLogin->isLoggedIn()) {
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Location</h3>
-          <p><?php if (isset($_SESSION['me'])) {
-                echo $userInfo->location;
-              } else if (isset($_SESSION['login'])) {
-                echo $Location;
+          <p><?php if (isset($_SESSION['login'])) {
+                echo $location;
               } ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
-          <h3>フォロワー数</h3>
-          <p><?php if (isset($_SESSION['me'])) {
-                echo $userInfo->followers_count;
-              } else echo '0'; ?></p>
+          <h3>営業時間</h3>
+          <p><?php if (isset($_SESSION['login_shop'])) {
+                echo $open . '~' . $close;
+              } ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
-          <h3>フォロー数</h3>
-          <p><?php if (isset($_SESSION['me'])) {
-                echo $userInfo->friends_count;
-              } else echo '0'; ?></p>
+          <h3>定休日</h3>
+          <p><?php if (isset($_SESSION['login_shop'])) {
+                echo $regular_holiday;
+              } ?></p>
         </div>
       </div>
     </div>
     </br>
-    <div class="align-items-center">
-      <h1>自己紹介</h1>
-      <textarea class="form-control col  align-items-center" id="Textarea" name="text" rows="3" placeholder="自分のキャラクターやPRポイントなどを詳細に書いてください"><?php if (isset($_SESSION['login'])) {
-                                                                                                                                              echo $introduction;
-                                                                                                                                            }
-                                                                                                                                            ?></textarea>
+
+    <div class="col-lg-3 col-sm-6">
+      <div class="about-text">
+        <h3>お店のurl</h3>
+        <p><?php if (isset($_SESSION['login_shop'])) {
+              echo $regular_holiday;
+            } ?></p><?php if (isset($_SESSION['login_shop'])) {
+                      echo $shop_url;
+                    }
+                    ?>
+      </div>
     </div>
-    <?php if (isset($_SESSION['me'])) : ?>
-      <form action="logout2.php" method="post" id="logout">
-        <button type="submit" class="btn btn-danger" value="logout">ログアウトする</button>
-        <input type="hidden" name="token" value="<?= h($_SESSION['token']); ?>">
-      </form>
-    <?php else : ?>
+    <?php if (isset($_SESSION['login_shop'])) : ?>
       <a class="btn btn-danger" href="logout.php" value="logout">ログアウトする</a>
     <?php endif; ?>
   </div>
-  <div class="container-fluid mx-auto" id="applying-order">
-    <h1>申請中の案件</h1>
+  <div class="container-fluid mx-auto row" id="applying-order">
+    <h1>掲載中の案件</h1>
+    <?php foreach ($jobs_info as $job_info) : ?>
+      <li class="media">
+        <img width="64" height="64" src="<?php echo $job_info['job_img_path']; ?>">
+
+        <div class="media-body mt-3">
+          <a class="mt-0 mb-1 font-weight-bold" href="job_contents.php?id=<?php echo $job_info['job_id']; ?>"><?php echo htmlspecialchars($job_info['job_title'], ENT_QUOTES, 'UTF-8'); ?></a>
+          <p>広告依頼内容簡単に記述、クリックで詳細画面へ</p>
+        </div>
+      </li>
+    <?php endforeach; ?>
+    </ul>
   </div>
 
   <div class="container-fluid mx-auto" id="receiving-order">
-    <h1>受注中の案件</h1>
+    <h1>依頼中の案件</h1>
   </div>
-  </div>
+
 
 
 

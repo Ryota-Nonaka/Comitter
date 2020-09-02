@@ -39,12 +39,11 @@ if (isset($_SESSION['login'])) {
       $stmt->debugDumpParams();
 
       $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-   catch (Exception $e) {
+    } catch (Exception $e) {
       echo 'エラーが発生しました。:' . $e->getMessage();
     }
+  }
 }
-
 if (isset($_SESSION['me'])) {
   $db = new Db();
   $pdo = $db->dbConnect();
@@ -119,7 +118,7 @@ if (isset($_SESSION['me'])) {
       <!-- </div> -->
       </br>
       <button class="btn btn-primary" type="submit2" name="edit">変更を適用する</button>
-                                                                  </div>
+    </div>
   </form>
 
 
@@ -129,5 +128,6 @@ if (isset($_SESSION['me'])) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
+
 
 </html>

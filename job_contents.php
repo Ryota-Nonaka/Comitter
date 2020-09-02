@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo = $db->dbConnect();
     $sql = $pdo->prepare("UPDATE job SET contacted_user_id='$contacted_user'  WHERE job_id='$job_id'");
 
+    
     $stmt->execute();
     $stmt->debugDumpParams();
   } catch (PDOException $e) {
@@ -77,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
   <form action="job_contact_form.php" method="post">
-    <?php if (isset($SESSION['login'])) : ?>
+    <?php if (isset($_SESSION['login'])) : ?>
       <input type="hidden" name="contacted_user" value="<?php echo $contacted_user; ?>">
       <input type="hidden" name="job_id" value="<?php echo $job_id; ?>">
       <button class="btn btn-primary" type="submit">申し込む</button>

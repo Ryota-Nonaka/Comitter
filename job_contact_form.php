@@ -16,21 +16,6 @@ if (isset($_POST['regist'])) {
     $errorMessage = 'データベースエラー';
     echo $e->getMessage();
   }
-
-
-
-  try {
-    $db = new Db();
-    $pdo = $db->dbConnect();
-    $sql = $pdo->prepare("UPDATE userdata SET contracted_job_id='$job_id' WHERE id='$contacted_user'");
-
-
-    $sql->execute();
-    $sql->debugDumpParams();
-  } catch (PDOException $e) {
-    $errorMessage = 'データベースエラー';
-    echo $e->getMessage();
-  }
 }
 
 
