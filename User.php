@@ -23,7 +23,7 @@ class User
 
   public function getUser($twUserId)
   {
-    $sql = sprintf("select * from tw_userdata where tw_user_id=%d", $twUserId);
+    $sql = sprintf("select * from userdata where tw_user_id=%d", $twUserId);
     $stmt = $this->_db->query($sql);
     $res = $stmt->fetch(\PDO::FETCH_OBJ);
     return $res;
@@ -31,7 +31,7 @@ class User
 
   private function _exists($twUserId)
   {
-    $sql = sprintf("select count(*) from tw_userdata where tw_user_id=%d", $twUserId);
+    $sql = sprintf("select count(*) from userdata where tw_user_id=%d", $twUserId);
     $res = $this->_db->query($sql);
     return $res->fetchColumn() === '1';
   }
@@ -53,7 +53,8 @@ class User
       tw_access_token,
       tw_access_token_secret,
       created,
-      modified
+      modified,
+      
       ) values (
       :tw_user_id,
       :tw_screen_name,
@@ -87,6 +88,8 @@ class User
     where tw_user_id =:tw_user_id";
 
     $stmt = $this->_db->prepare($sql);
+
+
 
 
     $stmt->bindValue(':tw_screen_name', $tokens['screen_name'], \PDO::PARAM_STR);

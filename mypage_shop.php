@@ -2,51 +2,63 @@
 
 require_once(__DIR__ . '/config.php');
 
-if (isset($_SESSION['login_shop'])) {
-  try {
-    $db = new Db();
-    $pdo = $db->dbConnect();
-    $id = $_SESSION['login_shop_id'];
-    $sql = "SELECT * FROM shop_userdata WHERE id='$id'";
-    $stmt = $pdo->query($sql);
-    foreach ($stmt as $row) {
-      $username = $row['shop_name'];
-      $location = $row['shop_pref'];
-      $open = $row['business_hour_open'];
-      $close = $row['business_hour_close'];
-      $regular_holiday = $row['regular_holiday'];
-      $shop_img1 = $row['shop_img1'];
-      $shop_img1 = $row['shop_img1'];
-      $shop_img1 = $row['shop_img1'];
-      $shop_url = $row['shop_url'];
-    }
-  } catch (\Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
-  }
+$name = $_GET['shop_name'];
+$db = new Db();
+$pdo = $db->dbConnect();
+$sql = $pdo->prepare("SELECT * FROM shop_userdata WHERE shop_name='$name'");
+$sql->execute();
+foreach ($sql as $row) {
+  $id = $row['id'];
+  $username = $row['shop_name'];
+  $location = $row['shop_pref'];
+  $open = $row['business_hour_open'];
+  $close = $row['business_hour_close'];
+  $regular_holiday = $row['regular_holiday'];
+  $shop_img1 = $row['shop_img1'];
+  $shop_img1 = $row['shop_img1'];
+  $shop_img1 = $row['shop_img1'];
+  $shop_url = $row['shop_url'];
 }
 
 
 
-try {
+$jobs_info = array();
+if (isset($_SESSION['login_shop'])) {
   $db = new Db();
   $pdo = $db->dbConnect();
-  $sql = "SELECT * from job where shop_id='$id'";
+  $sql = $pdo->prepare("SELECT * FROM job WHERE shop_id='$id'");
+  $sql->execute();
 
-  $jobs_info = array();
-  $stmt = $pdo->query($sql);
-
-  foreach ($stmt as $row) {
+  foreach ($sql as $row) {
     array_push($jobs_info, $row);
-    // var_dump($job_info);
-
-
-
-
+    $contacted_user_id = $row['contacted_user_id'];
   }
-} catch (PDOException $e) {
-  $errorMessage = 'データベースエラー';
-  echo $e->getMessage();
 }
+
+
+// try {
+//   $db = new Db();
+//   $pdo = $db->dbConnect();
+//   $sql = "SELECT * from userdata where id='$contacted_user_id'";
+
+//   if ($contacted_user_id != 0) {
+
+//     $users_info = array();
+//     $stmt = $pdo->query($sql);
+
+//     foreach ($stmt as $row) {
+//       array_push($users_info, $row);
+//     }
+//   } elseif ($contacted_user_id = 0) {
+//     exit();
+//   }
+// } catch (PDOException $e) {
+//   $errorMessage = 'データベースエラー';
+//   echo $e->getMessage();
+// }
+
+
+
 
 
 
@@ -89,8 +101,8 @@ try {
 
 
   if (isset($_SESSION['login_shop'])) : ?>
-    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
-    <a href='mypage.php'>マイページへ</a>
+    <div class=text-light> ようこそ、<span class="text-primary"><?php echo $_SESSION['login_shop']; ?> </span>さん！</div>
+    <a href='mypage_shop.php?=<?php echo ($_SESSION['login_shop']); ?>'>マイページへ</a>
 
   <?php endif; ?>
 
@@ -151,25 +163,25 @@ try {
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Location</h3>
-          <p><?php if (isset($_SESSION['login'])) {
-                echo $location;
-              } ?></p>
+          <p><?php
+              echo $location;
+              ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>営業時間</h3>
-          <p><?php if (isset($_SESSION['login_shop'])) {
-                echo $open . '~' . $close;
-              } ?></p>
+          <p><?php
+              echo $open . '~' . $close;
+              ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>定休日</h3>
-          <p><?php if (isset($_SESSION['login_shop'])) {
-                echo $regular_holiday;
-              } ?></p>
+          <p><?php
+              echo $regular_holiday;
+              ?></p>
         </div>
       </div>
     </div>
@@ -178,12 +190,12 @@ try {
     <div class="col-lg-3 col-sm-6">
       <div class="about-text">
         <h3>お店のurl</h3>
-        <p><?php if (isset($_SESSION['login_shop'])) {
-              echo $regular_holiday;
-            } ?></p><?php if (isset($_SESSION['login_shop'])) {
-                      echo $shop_url;
-                    }
-                    ?>
+        <p><?php
+            echo $regular_holiday;
+            ?></p><?php
+                  echo $shop_url;
+
+                  ?>
       </div>
     </div>
     <?php if (isset($_SESSION['login_shop'])) : ?>
@@ -191,32 +203,34 @@ try {
     <?php endif; ?>
   </div>
   <div class="container-fluid mx-auto row" id="applying-order">
-    <h1>掲載中の案件</h1>
-    <?php foreach ($jobs_info as $job_info) : ?>
-      <li class="media">
-        <img width="64" height="64" src="<?php echo $job_info['job_img_path']; ?>">
+    <?php if (isset($_SESSION['login_shop'])) : ?>
+      <h1>掲載中の案件</h1>
+      <?php foreach ($jobs_info as $job_info) : ?>
+        <li class="media">
+          <img width="64" height="64" src="<?php echo $job_info['job_img_path']; ?>">
 
-        <div class="media-body mt-3">
-          <a class="mt-0 mb-1 font-weight-bold" href="job_contents.php?id=<?php echo $job_info['job_id']; ?>"><?php echo htmlspecialchars($job_info['job_title'], ENT_QUOTES, 'UTF-8'); ?></a>
-          <p>広告依頼内容簡単に記述、クリックで詳細画面へ</p>
-        </div>
-      </li>
-    <?php endforeach; ?>
-    </ul>
+          <div class="media-body mt-3">
+            <a class="mt-0 mb-1 font-weight-bold" href="job_contents.php?id=<?php echo $job_info['job_id']; ?>"><?php echo htmlspecialchars($job_info['job_title'], ENT_QUOTES, 'UTF-8'); ?></a>
+            <p>広告依頼内容簡単に記述、クリックで詳細画面へ</p>
+          </div>
+        </li>
+      <?php endforeach; ?>
+      </ul>
   </div>
-
-  <div class="container-fluid mx-auto" id="receiving-order">
-    <h1>依頼中の案件</h1>
-  </div>
+<?php endif; ?>
 
 
 
+</div>
 
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 </body>
 
 </html>

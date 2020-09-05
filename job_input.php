@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__ . '/config.php');
-
+var_dump($_SESSION['login_shop_id']);
 $pref = array(
   0 => '選択下さい。',
   1 => '北海道',

@@ -1,0 +1,13 @@
+{
+  "require": {
+    "facebook/php-sdk-v4": "~5.0",
+    "facebook/graph-sdk": "^5.7",
+    "php-http/curl-client": "^2.1",
+    "guzzlehttp/psr7": "^1.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "MyApp\\": "lib/"
+    }
+  }
+}

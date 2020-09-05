@@ -2,22 +2,18 @@
 
 require_once(__DIR__ . '/config.php');
 
-if (isset($_SESSION['login'])) {
-  try {
-    $db = new Db();
-    $pdo = $db->dbConnect();
-    $id = $_SESSION['id'];
-    $sql = "SELECT * FROM userdata WHERE id='$id'";
-    $stmt = $pdo->query($sql);
-    foreach ($stmt as $row) {
-      $username = $row['username'];
-      $Location = $row['pref01'];
-      $introduction = $row['introduction'];
-      $profile_img = $row['img_path'];
-    }
-  } catch (\Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
-  }
+
+$name = $_GET['username'];
+$db = new Db();
+$pdo = $db->dbConnect();
+$sql = $pdo->prepare("SELECT * FROM userdata WHERE username='$name'");
+$sql->execute();
+foreach ($sql as $row) {
+  $id = $row['id'];
+  $username = $row['username'];
+  $location = $row['pref'];
+  $introduction = $row['introduction'];
+  $profile_img = $row['img_path'];
 }
 
 
@@ -25,17 +21,20 @@ if (isset($_SESSION['login'])) {
 
 $twitterLogin = new MyApp\TwitterLogin();
 
-if ($twitterLogin->isLoggedIn()) {
-  $me = $_SESSION['me'];
-  $token = $_SESSION['token'];
-  $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
 
-  $tweets = $twitter->getTweets();
-  $userInfo = $twitter->getProfile();
+$me = $_SESSION['me'];
+$token = $_SESSION['token'];
+$twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
+
+$tweets = $twitter->getTweets();
+$userInfo = $twitter->getProfile();
 
 
-  MyApp\Token::create();
-}
+
+
+
+MyApp\Token::create();
+
 
 
 
@@ -46,17 +45,11 @@ try {
   $pdo = $db->dbConnect();
   $sql = "SELECT * from job where contacted_user_id='$id'";
 
-  $job_info = array();
+  $jobs_info = array();
   $stmt = $pdo->query($sql);
 
   foreach ($stmt as $row) {
-    array_push($job_info, $row);
-    var_dump($job_info);
-    // $job_id = $row['job_id'];
-    // $job_started = $row['date_job_started'];
-    // $job_title = $row['job_title'];
-    // $job_body = $row['job_body'];
-    // $job_img = $row['job_img_path'];
+    array_push($jobs_info, $row);
   }
 } catch (PDOException $e) {
   $errorMessage = 'データベースエラー';
@@ -100,18 +93,21 @@ try {
             <a class="nav-link" href="confirm_input.php">お問い合わせ</a>
           </li>
         </ul>
-        <form class="form-inline mt-2 mt-md-0"> -->
+        <form class="form-inline mt-2 mt-md-0">
 
-  <!-- 切り替えボタンの設定 -->
+          <!-- 切り替えボタンの設定 -->
   <?php
 
 
   if (isset($_SESSION['login'])) : ?>
     <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
-    <a href='mypage.php'>マイページへ</a>
+    <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
   <?php elseif (isset($_SESSION['me'])) : ?>
     <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
     <a href='mypage.php'>マイページへ</a>
+  <?php elseif (isset($_SESSION['login_shop'])) : ?>
+    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
+    <a href="mypage_shop.php?=<?php echo ($_SESSION['login_shop']) ?>">マイページへ</a>
   <?php endif; ?>
 
 
@@ -121,7 +117,7 @@ try {
   </div>
   </nav>
 
-  </header> -->
+  </header>
 
   <!-- モーダルの設定 -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -164,33 +160,28 @@ try {
       </div>
     <?php endif; ?>
     </br>
-    <?php if (!isset($_SESSION['me'])) : ?>
+    <?php if (!isset($_SESSION['me']) && (isset($_SESSION['login']))) : ?>
       <div class="row justify-content-start">
         <a class="btn btn-primary" href="login.php" role="button">twitterアカウントと連携させる</a>
       </div>
     <?php endif; ?>
 
     <h1>proflile</h1>
-    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php if (isset($_SESSION['login'])) {
-                                                                echo h($profile_img);
-                                                              } ?>" width="100px">
+    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php echo h($profile_img); ?>" width="100px">
     <div class="row">
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Username</h3>
-          <p> <?php if (isset($_SESSION['login'])) {
-                echo  $username;
-              }  ?></p>
+          <p> <?php
+              echo $username;
+              ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Location</h3>
-          <p><?php if (isset($_SESSION['me'])) {
-                echo $userInfo->location;
-              } else if (isset($_SESSION['login'])) {
-                echo $Location;
-              } ?></p>
+          <p><?php
+              echo $location; ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
@@ -229,12 +220,24 @@ try {
   </div>
   <div class="container-fluid mx-auto" id="applying-order">
     <h1>申請中の案件</h1>
+    <?php foreach ($jobs_info as $job_info) : ?>
+      <li class="media">
+        <img width="64" height="64" src="<?php echo $job_info['job_img_path']; ?>">
+
+        <div class="media-body mt-3">
+          <a class="mt-0 mb-1 font-weight-bold" href="job_contents.php?id=<?php echo $job_info['job_id']; ?>"><?php echo htmlspecialchars($job_info['job_title'], ENT_QUOTES, 'UTF-8'); ?></a>
+          <p>広告依頼内容簡単に記述、クリックで詳細画面へ</p>
+        </div>
+      </li>
+    <?php endforeach; ?>
+    </ul>
   </div>
 
   <div class="container-fluid mx-auto" id="receiving-order">
     <h1>受注中の案件</h1>
+
   </div>
-  </div>
+
 
 
 

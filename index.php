@@ -117,13 +117,13 @@ if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
 
           if (isset($_SESSION['login'])) : ?>
             <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
-            <a href='mypage_user.php'>マイページへ</a>
+            <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
           <?php elseif (isset($_SESSION['me'])) : ?>
             <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
             <a href='mypage_user.php'>マイページへ</a>
           <?php elseif (isset($_SESSION['login_shop'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
-            <a href='mypage_shop.php'>マイページへ</a>
+            <div class=text-light> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
+            <a href='mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>'>マイページへ</a>
           <?php else : ?>
             <a href='signin_user.php'>ユーザーログインはこちら</a>
             <a href='signin_shop.php'>店舗会員ログインはこちら</a>

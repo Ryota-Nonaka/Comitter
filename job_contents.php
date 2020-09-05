@@ -19,6 +19,7 @@ foreach ($stmt as $row) {
   $job_img = $row['job_img_path'];
   $job_body = $row['job_body'];
   $job_status = $row['job_status'];
+  $contacted_user_id = $row['contacted_user_id'];
 }
 $pdo = null;
 
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo = $db->dbConnect();
     $sql = $pdo->prepare("UPDATE job SET contacted_user_id='$contacted_user'  WHERE job_id='$job_id'");
 
-    
+
     $stmt->execute();
     $stmt->debugDumpParams();
   } catch (PDOException $e) {
@@ -44,6 +45,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo $e->getMessage();
   }
 }
+
+$applying_users = array();
+$applying_user = array();
+if (isset($_SESSION['login_shop'])) {
+  $db = new Db();
+  $pdo = $db->dbConnect();
+  $sql = $pdo->prepare("SELECT * FROM userdata WHERE id='$contacted_user_id'");
+  $sql->execute();
+  foreach ($sql as $row) {
+    array_push($applying_users, $row);
+
+    var_dump($row);
+  }
+}
+
+
+
 
 ?>
 
@@ -85,6 +103,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
   </form>
 
+  <?php if (isset($_SESSION['login_shop'])) : ?>
+   
+    <h1>申請中のユーザー</h1>
+    <ul>
+      <?php foreach ($applying_users as $applying_user) : ?>
+        <li class="media">
+          <img width="64" height="64" src="<?php echo $applying_user['img_path']; ?>">
+
+          <div class="media-body mt-3">
+            <a class="mt-0 mb-1 font-weight-bold" href="mypage_user.php?username=<?php echo ($applying_user['username']); ?>"><?php echo htmlspecialchars($applying_user['username'], ENT_QUOTES, 'UTF-8'); ?></a>
+          </div>
+        </li>
+    </ul>
+  <?php endforeach; ?>
+<?php endif; ?>
 
 
 
@@ -103,15 +136,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-
-
-
-
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-K09cMhJkkwNoZK1BRIJX6fQk06LqHSs8LdWAE24M/18F4NlePaltFx1cnB9wKwQX" crossorigin="anonymous"></script>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-K09cMhJkkwNoZK1BRIJX6fQk06LqHSs8LdWAE24M/18F4NlePaltFx1cnB9wKwQX" crossorigin="anonymous"></script>
 </body>
 
 </html>

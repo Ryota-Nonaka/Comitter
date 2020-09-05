@@ -20,7 +20,7 @@ $job_title = $_POST['job_title'];
 $job_body = $_POST['job_body'];
 $pref = $_POST['pref'];
 $age = $_POST['age'];
-var_dump($_SESSION['login_shop_id']);
+
 if (isset($_SESSION["login_shop"])) {
   $shop_id = $_SESSION['login_shop_id'];
   $job_status = 1;
@@ -45,6 +45,8 @@ if (isset($_SESSION["login_shop"])) {
     }
   }
 }
+
+var_dump($shop_id);
 ?>
 <!doctype html>
 <html lang="ja">

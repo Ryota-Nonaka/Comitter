@@ -38,13 +38,12 @@ class TwitterLogin
     // exit;
     session_regenerate_id(true); //session hijack
     $_SESSION['me'] = $user->getUser($tokens['user_id']);
-    
     unset($_SESSION['oauth_token']);
     unset($_SESSION['oauth_token_secret']);
 
     goHome();
   }
-  
+
 
   private function _redirectFlow()
   {

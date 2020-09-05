@@ -18,11 +18,11 @@ if (isset($_POST['signup_shop'])) {
     $errorMessage = 'メールアドレスが未入力です。';
   } else if (empty($_POST['shop_password'])) {
     $errorMessage = 'パスワードが未入力です。';
-  } else if (empty($_POST['shop_zip01'])) {
+  } else if (empty($_POST['shop_zip'])) {
     $errorMessage = '郵便番号を入力してください。';
-  } else if (empty($_POST['shop_pref01'])) {
+  } else if (empty($_POST['shop_pref'])) {
     $errorMessage = '住所を入力してください。';
-  } else if (empty($_POST['shop_addr01'])) {
+  } else if (empty($_POST['shop_addr'])) {
     $errorMessage = '住所を入力してください。';
   } else if (empty($_POST['business_hour_open'])) {
     $errorMessage = '営業時間を入力してください。';
@@ -32,16 +32,16 @@ if (isset($_POST['signup_shop'])) {
     $errorMessage = '定休日を入力してください。';
   }
 
-  if (!empty($_POST['shop_name']) && !empty($_POST['shop_furigana']) && !empty($_POST['shop_tell']) && !empty($_POST['shop_email']) && !empty($_POST['shop_password']) && !empty($_POST['shop_zip01']) && !empty($_POST['shop_pref01']) && !empty($_POST['shop_addr01']) && !empty($_POST['business_hour_open']) && !empty($_POST['business_hour_close']) && !empty($_POST['regular_holiday'])) {
+  if (!empty($_POST['shop_name']) && !empty($_POST['shop_furigana']) && !empty($_POST['shop_tell']) && !empty($_POST['shop_email']) && !empty($_POST['shop_password']) && !empty($_POST['shop_zip']) && !empty($_POST['shop_pref']) && !empty($_POST['shop_addr']) && !empty($_POST['business_hour_open']) && !empty($_POST['business_hour_close']) && !empty($_POST['regular_holiday'])) {
 
     $shop_username = $_POST['shop_name'];
     $shop_furigana = $_POST['shop_furigana'];
     $shop_tell = $_POST['shop_tell'];
     $shop_email = $_POST['shop_email'];
     $shop_password = password_hash($_POST['shop_password'], PASSWORD_DEFAULT);
-    $shop_ad01 = $_POST['shop_zip01'];
-    $shop_ad02 = $_POST['shop_pref01'];
-    $shop_ad03 = $_POST['shop_addr01'];
+    $shop_ad01 = $_POST['shop_zip'];
+    $shop_ad02 = $_POST['shop_pref'];
+    $shop_ad03 = $_POST['shop_addr'];
     $business_hour_open = $_POST['business_hour_open'];
     $business_hour_close = $_POST['business_hour_close'];
     $regular_holiday = $_POST['regular_holiday'];
@@ -64,15 +64,15 @@ if (isset($_POST['signup_shop'])) {
       //データベース処理のクラス化
       $db = new Db();
       $pdo = $db->dbConnect();
-      $stmt = $pdo->prepare("INSERT INTO shop_userdata(shop_name,shop_furigana,shop_tell,shop_email,	shop_password,shop_zip01,shop_pref01,shop_addr01,business_hour_open,business_hour_close,regular_holiday,shop_url) VALUES (:shop_name,:shop_furigana,:shop_tell,:shop_email,:shop_password,:shop_zip01,:shop_pref01,:shop_addr01,:business_hour_open,:business_hour_close,:regular_holiday,:shop_url)");
+      $stmt = $pdo->prepare("INSERT INTO shop_userdata(shop_name,shop_furigana,shop_tell,shop_email,shop_password,shop_zip,shop_pref,shop_addr,business_hour_open,business_hour_close,regular_holiday,shop_url) VALUES (:shop_name,:shop_furigana,:shop_tell,:shop_email,:shop_password,:shop_zip,:shop_pref,:shop_addr,:business_hour_open,:business_hour_close,:regular_holiday,:shop_url)");
       $stmt->bindParam(':shop_name',  $shop_username, PDO::PARAM_STR);
       $stmt->bindParam(':shop_furigana', $shop_furigana, PDO::PARAM_STR);
       $stmt->bindParam(':shop_tell',  $shop_tell, PDO::PARAM_STR);
       $stmt->bindParam(':shop_email',  $shop_email, PDO::PARAM_STR);
       $stmt->bindParam(':shop_password', $shop_password, PDO::PARAM_STR);
-      $stmt->bindParam(':shop_zip01',  $shop_ad01, PDO::PARAM_STR);
-      $stmt->bindParam(':shop_pref01',  $shop_ad02, PDO::PARAM_STR);
-      $stmt->bindParam(':shop_addr01', $shop_ad03, PDO::PARAM_STR);
+      $stmt->bindParam(':shop_zip',  $shop_ad01, PDO::PARAM_STR);
+      $stmt->bindParam(':shop_pref',  $shop_ad02, PDO::PARAM_STR);
+      $stmt->bindParam(':shop_addr', $shop_ad03, PDO::PARAM_STR);
       $stmt->bindParam(':business_hour_open',  $business_hour_open, PDO::PARAM_STR);
       $stmt->bindParam(':business_hour_close',  $business_hour_close, PDO::PARAM_STR);
       $stmt->bindParam(':regular_holiday', $regular_holiday, PDO::PARAM_STR);
@@ -238,23 +238,23 @@ if (isset($_POST['signup_shop'])) {
         <div class="form-row">
           <div class="col-md-3 mb-5">
             <label for="inputAddress01">郵便番号(7桁)</label>
-            <input type="text" name="shop_zip01" maxlength="8" onKeyUp="AjaxZip3.zip2addr(this,'','pref01','addr01');" class="form-control" id="inputAddress01" placeholder="1030013" value="<?php if (!empty($_POST["shop_zip01"])) {
-                                                                                                                                                                                                echo htmlspecialchars($_POST["shop_zip01"], ENT_QUOTES);
-                                                                                                                                                                                              } ?>">
+            <input type="text" name="shop_zip" maxlength="8" onKeyUp="AjaxZip3.zip2addr(this,'','pref','addr');" class="form-control" id="inputAddress01" placeholder="1030013" value="<?php if (!empty($_POST["shop_zip"])) {
+                                                                                                                                                                                          echo htmlspecialchars($_POST["shop_zip"], ENT_QUOTES);
+                                                                                                                                                                                        } ?>">
 
           </div>
           <div class="col-md-3">
             <label for="inputAddress02">都道府県</label>
-            <input type="text" name="shop_pref01" id="inputAddress02" class="form-control" placeholder="東京都" value="<?php if (!empty($_POST["shop_pref01"])) {
-                                                                                                                      echo htmlspecialchars($_POST["shop_pref01"], ENT_QUOTES);
-                                                                                                                    } ?>">
+            <input type="text" name="shop_pref" id="inputAddress02" class="form-control" placeholder="東京都" value="<?php if (!empty($_POST["shop_pref"])) {
+                                                                                                                    echo htmlspecialchars($_POST["shop_pref"], ENT_QUOTES);
+                                                                                                                  } ?>">
 
           </div>
           <div class="col-md-6">
             <label for="inputAddress03">住所</label>
-            <input type="text" name="shop_addr01" class="form-control" id="inputAddress03" placeholder="中央区日本橋人形町" value="<?php if (!empty($_POST["shop_addr01"])) {
-                                                                                                                            echo htmlspecialchars($_POST["shop_addr01"], ENT_QUOTES);
-                                                                                                                          } ?>">
+            <input type="text" name="shop_addr" class="form-control" id="inputAddress03" placeholder="中央区日本橋人形町" value="<?php if (!empty($_POST["shop_addr"])) {
+                                                                                                                          echo htmlspecialchars($_POST["shop_addr"], ENT_QUOTES);
+                                                                                                                        } ?>">
 
           </div>
         </div>
@@ -262,7 +262,7 @@ if (isset($_POST['signup_shop'])) {
 
         <!--営業時間-->
         <div class="row input-group col-md-6">
-          <label for="scheduled-time">営業時間　</label>
+          <label for="scheduled-time">営業時間</label>
           <input type="time" class="form-control col-md-3" name="business_hour_open" id="scheduled-time" value="<?php if (!empty($_POST["business_hour_open"])) {
                                                                                                                   echo htmlspecialchars($_POST["business_hour_open"], ENT_QUOTES);
                                                                                                                 } ?>">
