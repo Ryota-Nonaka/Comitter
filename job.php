@@ -46,7 +46,7 @@ if (isset($_SESSION["login_shop"])) {
   }
 }
 
-var_dump($shop_id);
+
 ?>
 <!doctype html>
 <html lang="ja">
@@ -104,7 +104,7 @@ var_dump($shop_id);
       <tbody>
         <tr>
           <th scope="row">年齢</th>
-          <td>"<?php echo $age; ?></td>
+          <td><?php echo $age; ?></td>
         </tr>
       </tbody>
 

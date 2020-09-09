@@ -19,21 +19,22 @@ class Facebook
   public function getUserNode()
   {
     $process = function () {
-      $res = $this->_fb->get('/me?fields=id,name,email,link');
+      $res = $this->_fb->get('/me?fields=id,name,email');
       $userNode = $res->getGraphUser();
       return $userNode;
     };
     return $this->_request($process);
   }
 
+
   private function _request($process)
   {
     try {
       $res = $process();
-    } catch (\Facebook\Exception\FacebookResponseException $e) {
+    } catch (\Facebook\Exceptions\FacebookResponseException $e) {
       echo 'Response Error: ' . $e->getMessage();
       exit;
-    } catch (\Facebook\Exception\FacebookSDKException $e) {
+    } catch (\Facebook\Exceptions\FacebookSDKException $e) {
       echo 'SDK Error: ' . $e->getMessage();
       exit;
     }
@@ -41,6 +42,19 @@ class Facebook
   }
 
   public function getPosts()
+  {
+    $process = function () {
+      $res = $this->_fb->get('/me/posts?limit=3');
+      $body = $res->getDecodedBody();
+      if (empty($body['data'])) {
+        return [];
+      } else {
+        return $body['data'];
+      }
+    };
+    return $this->_request($process);
+  }
+  public function getFriends()
   {
     $process = function () {
       $res = $this->_fb->get('/me/posts?limit=3');

@@ -56,7 +56,6 @@ if (isset($_SESSION['login_shop'])) {
   foreach ($sql as $row) {
     array_push($applying_users, $row);
 
-    var_dump($row);
   }
 }
 

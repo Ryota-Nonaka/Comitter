@@ -34,12 +34,14 @@ class TwitterLogin
 
     $user = new User();
     $user->saveTokens($tokens);
+    $profile= new Twitter();
     // echo "token saved";
     // exit;
     session_regenerate_id(true); //session hijack
     $_SESSION['me'] = $user->getUser($tokens['user_id']);
     unset($_SESSION['oauth_token']);
     unset($_SESSION['oauth_token_secret']);
+    $_SESSION['me_followers'] = $profile->getProfile($token['followers']);
 
     goHome();
   }
@@ -55,7 +57,8 @@ class TwitterLogin
     //save token
     $_SESSION['oauth_token'] = $tokens['oauth_token'];
     $_SESSION['oauth_token_secret'] = $tokens['oauth_token_secret'];
-    //redirect 
+    //redirect
+
     $authorizeUrl = $conn->url('oauth/authorize', ['oauth_token' => $tokens['oauth_token']]);
     header('Location: ' . $authorizeUrl);
     exit;

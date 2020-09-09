@@ -73,8 +73,6 @@ if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
 
 
 
-
-
 ?>
 <!doctype html>
 <html lang="ja">
@@ -94,7 +92,7 @@ if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
 </head>
 
 <body>
-  <header>
+  <!-- <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">食バズ(仮)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,32 +110,32 @@ if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
         <form class="form-inline mt-2 mt-md-0">
 
           <!-- 切り替えボタンの設定 -->
-          <?php
+  <?php
 
 
-          if (isset($_SESSION['login'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
-            <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
-          <?php elseif (isset($_SESSION['me'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
-            <a href='mypage_user.php'>マイページへ</a>
-          <?php elseif (isset($_SESSION['login_shop'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
-            <a href='mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>'>マイページへ</a>
-          <?php else : ?>
-            <a href='signin_user.php'>ユーザーログインはこちら</a>
-            <a href='signin_shop.php'>店舗会員ログインはこちら</a>
-          <?php endif; ?>
-
-
-
+  if (isset($_SESSION['login'])) : ?>
+    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+    <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
+  <?php elseif (isset($_SESSION['me'])) : ?>
+    <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
+    <a href='mypage_user.php'>マイページへ</a>
+  <?php elseif (isset($_SESSION['login_shop'])) : ?>
+    <div class=text-light> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
+    <a href='mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>'>マイページへ</a>
+  <?php else : ?>
+    <a href='signin_user.php'>ユーザーログインはこちら</a>
+    <a href='signin_shop.php'>店舗会員ログインはこちら</a>
+  <?php endif; ?>
 
 
 
-        </form>
 
-      </div>
-    </nav>
+
+
+  </form>
+
+  </div>
+  </nav>
 
   </header>
 
@@ -217,19 +215,17 @@ if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
     </div>
 
 
-    <!-- Marketing messaging and featurettes
-      ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
+
 
     <div class="container marketing"></div>
     <form method="get" action="result.php">
       <div class="form-row">
-        <p class="text-left text-secondary">エリア・年齢・期間で検索</ｐ>
-          <!-- <div class="col-sm-auto">
-            <input type="text" class="form-control" placeholder="年齢" name="age">
-          </div> -->
+        <p class="text-left text-secondary">　
+          商品名・エリアで検索</ｐ>
+
+
           <div class="col-sm-XX">
-            <input type="text" class="form-control" placeholder="店名" name="job_name" id="job_name" value="<?php echo $name_search_value ?>">
+            <input type="text" class="form-control" placeholder="商品名" name="job_name" id="job_name" value="<?php echo $name_search_value ?>">
           </div>
           <div class="col-sm-XX">
             <input type="text" class="form-control" placeholder="エリア" name="job_location" id="job_location" value="<?php echo $location_search_value ?>">
@@ -242,30 +238,7 @@ if (isset($_GET['job_name']) && isset($_GET['job_location'])) {
     </form>
     <!-- Three columns of text below the carousel -->
     </br>
-    <h1 class="text-secondary">投稿ジャンルから探す</h1>
-    <div class="row">
-      <div class="col-lg-4">
-        <img class="rounded-circle" src="src\images\oban.gif" alt="Generic placeholder image" width="140" height="140">
-        <h2 class="text-secondary">YOUTUBE</h2>
-        <p class="text-secondary">おばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっす</p>
-        <p><a class="btn btn-primary" href="info.php" role="button">検索画面へ</a></p>
-      </div><!-- /.col-lg-4 -->
-      <div class="col-lg-4">
-        <img class="rounded-circle" src="src\images\oban.gif" alt="Generic placeholder image" width="140" height="140">
-        <h2 class="text-secondary">SNS</h2>
-        <p class="text-secondary">おばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっす</p>
-        <p><a class="btn btn-primary" href="info.php" role="button">検索画面へ</a></p>
-      </div><!-- /.col-lg-4 -->
-      <div class="col-lg-4">
-        <img class="rounded-circle" src="src\images\oban.gif" alt="Generic placeholder image" width="140" height="140">
-        <h2 class="text-secondary">コラム・記事など</h2>
-        <p class="text-secondary">おばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっすおばんっす</p>
-        <p><a class="btn btn-primary" href="info.php" alt="Generic placeholder image" role="button">検索画面へ</a></p>
-      </div><!-- /.col-lg-4 -->
-      </h1><!-- /.row -->
 
-
-    </div><!-- /.container -->
 
 
     <!-- FOOTER -->

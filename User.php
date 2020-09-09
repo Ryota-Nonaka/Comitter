@@ -47,22 +47,8 @@ class User
 
   private function _insert($tokens)
   {
-    $sql = "insert into userdata (
-      tw_user_id,
-      tw_screen_name,
-      tw_access_token,
-      tw_access_token_secret,
-      created,
-      modified,
-      
-      ) values (
-      :tw_user_id,
-      :tw_screen_name,
-      :tw_access_token,
-      :tw_access_token_secret,
-      now(),
-      now()
-      )";
+    $sql = "INSERT INTO userdata (
+      tw_user_id,tw_screen_name,tw_access_token,tw_access_token_secret,created,modified) VALUES (:tw_user_id,:tw_screen_name,:tw_access_token,:tw_access_token_secret,now(),now())";
     $stmt = $this->_db->prepare($sql);
 
     $stmt->bindValue(':tw_user_id', (int)$tokens['user_id'], \PDO::PARAM_INT);
@@ -80,6 +66,7 @@ class User
 
   private function _update($tokens)
   {
+
     $sql = "update userdata set
     tw_screen_name=:tw_screen_name,
     tw_access_token=:tw_access_token,

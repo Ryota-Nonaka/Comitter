@@ -78,7 +78,7 @@ try {
 </head>
 
 <body>
-  <!-- <header>
+  <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">食バズ(仮)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,26 +96,26 @@ try {
         <form class="form-inline mt-2 mt-md-0">
 
           <!-- 切り替えボタンの設定 -->
-  <?php
+          <?php
 
 
-  if (isset($_SESSION['login'])) : ?>
-    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
-    <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
-  <?php elseif (isset($_SESSION['me'])) : ?>
-    <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
-    <a href='mypage.php'>マイページへ</a>
-  <?php elseif (isset($_SESSION['login_shop'])) : ?>
-    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
-    <a href="mypage_shop.php?=<?php echo ($_SESSION['login_shop']) ?>">マイページへ</a>
-  <?php endif; ?>
+          if (isset($_SESSION['login'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+            <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
+          <?php elseif (isset($_SESSION['me'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
+            <a href='mypage.php'>マイページへ</a>
+          <?php elseif (isset($_SESSION['login_shop'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
+            <a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']) ?>">マイページへ</a>
+          <?php endif; ?>
 
 
 
-  </form>
+        </form>
 
-  </div>
-  </nav>
+      </div>
+    </nav>
 
   </header>
 

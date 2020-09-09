@@ -2,11 +2,13 @@
 session_start();
 $signUpMessage = '';
 if (isset($_SESSION["login"])) {
-	$signUpMessage = '登録が完了しました。あなたの登録IDは' . $userid . 'です。パスワードは' . $pass . 'です。';
+	$signUpMessage = '登録が完了しました。ようこそ、' . $_SESSION['login'] . 'さん。';
 }
 
-echo $signUpMessage;
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -23,11 +25,45 @@ echo $signUpMessage;
 	</head>
 
 <body>
+	<header>
+		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+			<a class="navbar-brand" href="index.php">食バズ(仮)</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarCollapse">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item active">
+						<a class="nav-link" href="confirm_input.php">お問い合わせ</a>
+					</li>
+				</ul>
+
+
+			</div>
+		</nav>
+
+	</header>
+
+
+	</br>
+	</br>
+	</br>
+	</br>
+	</br>
+
+	<p><?= $signUpMessage ?></p>
+	<a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>">
+		<p class="breadcrumb-item">マイページへ</p>
+	</a>
 	<a href="index.php">
 		<p class="breadcrumb-item">トップページに戻る</p>
 	</a>
-	</div>
-	</div>
+
+
+
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

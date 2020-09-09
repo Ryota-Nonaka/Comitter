@@ -7,7 +7,9 @@ $errorMessage = "";
 $signUpMessage = "";
 
 
-if (isset($_POST['signup_shop'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+
   if (empty($_POST['shop_name'])) {
     $errorMessage = '店名が未入力です。';
   } else if (empty($_POST['shop_furigana'])) {
@@ -32,26 +34,33 @@ if (isset($_POST['signup_shop'])) {
     $errorMessage = '定休日を入力してください。';
   }
 
+
+
+
   if (!empty($_POST['shop_name']) && !empty($_POST['shop_furigana']) && !empty($_POST['shop_tell']) && !empty($_POST['shop_email']) && !empty($_POST['shop_password']) && !empty($_POST['shop_zip']) && !empty($_POST['shop_pref']) && !empty($_POST['shop_addr']) && !empty($_POST['business_hour_open']) && !empty($_POST['business_hour_close']) && !empty($_POST['regular_holiday'])) {
 
     $shop_username = $_POST['shop_name'];
     $shop_furigana = $_POST['shop_furigana'];
     $shop_tell = $_POST['shop_tell'];
     $shop_email = $_POST['shop_email'];
-    $shop_password = password_hash($_POST['shop_password'], PASSWORD_DEFAULT);
     $shop_ad01 = $_POST['shop_zip'];
     $shop_ad02 = $_POST['shop_pref'];
     $shop_ad03 = $_POST['shop_addr'];
     $business_hour_open = $_POST['business_hour_open'];
     $business_hour_close = $_POST['business_hour_close'];
-    $regular_holiday = $_POST['regular_holiday'];
+
     $shop_url = $_POST['shop_url'];
 
+    if (isset($_POST['regular_holiday']) && is_array($_POST['regular_holiday'])) {
+      $regular_holiday = implode("、", $_POST['regular_holiday']);
+    }
 
-    if (!$mail = filter_var($_POST['shop_email'], FILTER_VALIDATE_EMAIL)) {
+    if (!$shop_email = filter_var($_POST['shop_email'], FILTER_VALIDATE_EMAIL)) {
       echo '正しいメールアドレスを入力してください。';
       return false;
     }
+
+
 
     if (preg_match('/\A(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}+\z/i', $_POST['shop_password'])) {
       $pass = password_hash($_POST['shop_password'], PASSWORD_DEFAULT);
@@ -69,7 +78,7 @@ if (isset($_POST['signup_shop'])) {
       $stmt->bindParam(':shop_furigana', $shop_furigana, PDO::PARAM_STR);
       $stmt->bindParam(':shop_tell',  $shop_tell, PDO::PARAM_STR);
       $stmt->bindParam(':shop_email',  $shop_email, PDO::PARAM_STR);
-      $stmt->bindParam(':shop_password', $shop_password, PDO::PARAM_STR);
+      $stmt->bindParam(':shop_password', $pass, PDO::PARAM_STR);
       $stmt->bindParam(':shop_zip',  $shop_ad01, PDO::PARAM_STR);
       $stmt->bindParam(':shop_pref',  $shop_ad02, PDO::PARAM_STR);
       $stmt->bindParam(':shop_addr', $shop_ad03, PDO::PARAM_STR);
@@ -77,12 +86,13 @@ if (isset($_POST['signup_shop'])) {
       $stmt->bindParam(':business_hour_close',  $business_hour_close, PDO::PARAM_STR);
       $stmt->bindParam(':regular_holiday', $regular_holiday, PDO::PARAM_STR);
       $stmt->bindParam(':shop_url', $shop_url, PDO::PARAM_STR);
-
-      header('Location:created_account.php');
+      header('Location:new_account_shop_image.php');
       $stmt->execute();
       $userid = $pdo->lastinsertid();
+      $_SESSION['login_shop_id'] = $userid;
+      $_SESSION['login_shop'] = $shop_username;
     } catch (PDOException $e) {
-      $errorMessage = 'データベースエラー';
+      $errorMessage = 'すでにそのメールアドレスは使用されています。';
       echo $e->getMessage();
     }
   }
@@ -110,7 +120,7 @@ if (isset($_POST['signup_shop'])) {
 </head>
 
 <body>
-  <header>
+  <!-- <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">食バズ(仮)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,10 +141,10 @@ if (isset($_POST['signup_shop'])) {
           <!-- 切り替えボタンの設定 -->
 
 
-        </form>
+  </form>
 
-      </div>
-    </nav>
+  </div>
+  </nav>
 
   </header>
   <!-- モーダルの設定 -->
@@ -167,7 +177,7 @@ if (isset($_POST['signup_shop'])) {
   <div class="container mt-5 p-lg-5 bg-light">
     <form class="needs-validation" novalidate action="new_account_shop.php" method="post">
       <fieldset>
-        <legend>新規登録フォーム1</legend>
+        <legend>新規登録フォーム</legend>
         <div>
           <font color="#ff0000"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES); ?></font>
         </div>
@@ -277,26 +287,20 @@ if (isset($_POST['signup_shop'])) {
 
         <!--定休日-->
         <div class="input-group col-md-6">
-          <div class="input-group-append">
-            <label class="input-group" for="inputGroupSelect02">定休日　</label>
-          </div>
-          <select class="custom-select" id="inputGroupSelect02" name="regular_holiday" value=" " <?php if (!empty($_POST["business_hour"])) {
-                                                                                                    echo htmlspecialchars($_POST["business_hour"], ENT_QUOTES);
-                                                                                                  } ?>"">
-            <option selected value="0">曜日を選択してください</option>
-            <option value="1">月曜日</option>
-            <option value="2">火曜日</option>
-            <option value="3">水曜日</option>
-            <option value="4">木曜日</option>
-            <option value="5">金曜日</option>
-            <option value="6">土曜日</option>
-            <option value="7">日曜日</option>
-          </select>
+          <label for="scheduled-time">定休日</label>
+          <input type="checkbox" name="regular_holiday[]" value="月曜日">月曜日
+          <input type="checkbox" name="regular_holiday[]" value="火曜日">火曜日
+          <input type="checkbox" name="regular_holiday[]" value="水曜日">水曜日
+          <input type="checkbox" name="regular_holiday[]" value="木曜日">木曜日
+          <input type="checkbox" name="regular_holiday[]" value="金曜日">金曜日
+          <input type="checkbox" name="regular_holiday[]" value="土曜日">土曜日
+          <input type="checkbox" name="regular_holiday[]" value="日曜日">日曜日
         </div>
-
-
         <!--定休日-->
         </br>
+
+
+
         <!--サイトURL-->
         <div class="form-group row">
           <label for="inputEmail" class="col-sm-2 col-form-label">お店のサイトURL</label>
@@ -308,6 +312,9 @@ if (isset($_POST['signup_shop'])) {
           </div>
         </div>
         <!--/サイトURL-->
+
+
+
 
         <!--利用規約-->
         <div class="form-group pb-3">

@@ -8,6 +8,7 @@ require_once(__DIR__ . '/config.php');
 
 $errorMessage = "";
 $signUpMessage = "";
+$row = array();
 //エラーカウントの変数を書く
 //条件式の中にエラーカウントを足していき最後にエラーカウント0ならば認証処理する。
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -17,11 +18,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errorMessage = 'メールアドレスが入力されていません。';
   } else if (empty($_POST['pass'])) {
     $errorMessage = 'パスワードが未入力です。';
-  } else if (empty($_POST['zip01'])) {
+  } else if (empty($_POST['zip'])) {
     $errorMessage = '郵便番号を入力してください。';
-  } else if (empty($_POST['pref01'])) {
+  } else if (empty($_POST['pref'])) {
     $errorMessage = '住所を入力してください。';
-  } else if (empty($_POST['addr01'])) {
+  } else if (empty($_POST['addr'])) {
     $errorMessage = '住所を入力してください。';
   }
   if (!empty($_POST['username']) && !empty($_POST['email']) && !empty($_POST['pass']) && !empty($_POST['zip']) && !empty($_POST['pref']) && !empty($_POST['addr'])) {
@@ -50,12 +51,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       echo 'パスワードは半角英数字をそれぞれ1文字以上含んだ8文字以上で設定してください。';
       return false;
     }
-    // エラー処理
+
+
     try {
-      //データベース処理のクラス化
       $db = new Db();
       $pdo = $db->dbConnect();
-      $stmt = $pdo->prepare("INSERT INTO userdata(username,email,pass,zip,pref,addr,introduction, sex,age) VALUES (:username, :email, :pass, :zip, :pref, :addr,  :introduction, :sex, :age)");
+      $stmt = $pdo->prepare("INSERT INTO userdata(username,email,pass,zip,pref,addr,introduction, sex,age) VALUES (:username, :email, :pass, :zip, :pref, :addr,:introduction, :sex, :age)");
       $stmt->bindParam(':username', $user, PDO::PARAM_STR);
       $stmt->bindParam(':email', $mail, PDO::PARAM_STR);
       $stmt->bindParam(':pass', $pass, PDO::PARAM_STR);
@@ -65,12 +66,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $stmt->bindParam(':introduction', $introduction, PDO::PARAM_STR);
       $stmt->bindParam(':sex', $sex, PDO::PARAM_STR);
       $stmt->bindParam(':age', $age, PDO::PARAM_STR);
-
-
+      header('Location:created_account_user.php');
       $stmt->execute();
-      $userid = $pdo->lastinsertid();
+
+      $_SESSION['login_shop'] = $shop_username;
     } catch (PDOException $e) {
-      $errorMessage = 'データベースエラー';
+      $errorMessage = 'すでにそのメールアドレスは使用されています。';
       echo $e->getMessage();
     }
   }
@@ -229,16 +230,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!--/住所-->
 
         <!--性別-->
-        <div class="custom-control custom-radio ">
-          <input type="checkbox" class="custom-control-input" name="sex" id="custom-radio-1" value="男性">
-          <label class="custom-control-label" for="custom-radio-1">男性 </label>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="sex" id="male" value="男性" checked>
+          <label class="form-check-label" for="exampleRadios1">
+            男性
+          </label>
         </div>
-        <div class="custom-control custom-radio ">
-          <input type="checkbox" class="custom-control-input" name="sex" id="custom-radio-1" value="女性">
-          <label class="custom-control-label" for="custom-radio-1">女性 </label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="sex" id="female" value="女性">
+          <label class="form-check-label" for="exampleRadios2">
+            女性
+          </label>
         </div>
         <!--/性別-->
-
+        </br>
         <!-- 年齢 -->
         <select name="age">
           <?php for ($i = 0; $i < 100; $i += 1) {
@@ -247,10 +253,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </select>　歳
         <!-- 年齢 -->
 
-
+        </br>
         <!--自己紹介欄-->
         <div class="form-group pb-3">
-          <label for="Textarea">備考欄</label>
+          <label for="Textarea">自己紹介欄</label>
           <textarea class="form-control" id="Textarea" name="introduction" rows="3" placeholder="自分のキャラクターや自己PRを記入してください。" value="<?php if (!empty($_POST["text"])) {
                                                                                                                                     echo htmlspecialchars($_POST["text"], ENT_QUOTES);
                                                                                                                                   } ?>"></textarea>
@@ -258,7 +264,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!--/自己紹介欄-->
 
         <!--利用規約-->
-        <div class="form-group pb-3">
+        <!-- <div class="form-group pb-3">
           <div class="custom-control custom-checkbox">
             <input class="custom-control-input" type="checkbox" value="" id="invalidCheck" required />
             <label class="custom-control-label" for="invalidCheck">
@@ -268,7 +274,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               提出する前に同意する必要があります
             </div>
           </div>
-        </div>
+        </div> -->
         <!--/利用規約-->
 
         <!--ボタンブロック-->

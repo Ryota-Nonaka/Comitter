@@ -14,16 +14,13 @@ foreach ($sql as $row) {
   $open = $row['business_hour_open'];
   $close = $row['business_hour_close'];
   $regular_holiday = $row['regular_holiday'];
-  $shop_img1 = $row['shop_img1'];
-  $shop_img1 = $row['shop_img1'];
-  $shop_img1 = $row['shop_img1'];
+  $shop_img = $row['shop_img'];
   $shop_url = $row['shop_url'];
 }
 
 
-
 $jobs_info = array();
-if (isset($_SESSION['login_shop'])) {
+try {
   $db = new Db();
   $pdo = $db->dbConnect();
   $sql = $pdo->prepare("SELECT * FROM job WHERE shop_id='$id'");
@@ -33,7 +30,11 @@ if (isset($_SESSION['login_shop'])) {
     array_push($jobs_info, $row);
     $contacted_user_id = $row['contacted_user_id'];
   }
+} catch (PDOException $e) {
+  $errorMessage = 'データベースエラー';
+  echo $e->getMessage();
 }
+
 
 
 // try {
@@ -79,7 +80,7 @@ if (isset($_SESSION['login_shop'])) {
 </head>
 
 <body>
-  <!-- <header>
+  <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">食バズ(仮)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,23 +98,23 @@ if (isset($_SESSION['login_shop'])) {
         <form class="form-inline mt-2 mt-md-0">
 
           <!-- 切り替えボタンの設定 -->
-  <?php
+          <?php
 
 
-  if (isset($_SESSION['login_shop'])) : ?>
-    <div class=text-light> ようこそ、<span class="text-primary"><?php echo $_SESSION['login_shop']; ?> </span>さん！</div>
-    <a href='mypage_shop.php?=<?php echo ($_SESSION['login_shop']); ?>'>マイページへ</a>
-
-  <?php endif; ?>
-
+          if (isset($_SESSION['login_shop'])) : ?>
+            <div class=text-light> ようこそ、<span class="text-primary"><?php echo $_SESSION['login_shop']; ?> </span>さん！</div>
+            <a href='mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>'>マイページへ</a>
+          <?php endif; ?>
 
 
-  </form>
+        </form>
 
-  </div>
-  </nav>
+      </div>
+    </nav>
 
   </header>
+
+
   <!-- モーダルの設定 -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog">
@@ -133,9 +134,9 @@ if (isset($_SESSION['login_shop'])) {
             <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
             </button>
             <!-- <button type="button" class="btn btn-primary">変更を保存</button> -->
-          </div><!-- /.modal-footer -->
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   </br>
@@ -148,16 +149,16 @@ if (isset($_SESSION['login_shop'])) {
       <a class="btn btn-primary" href="job_input.php" role="button">依頼を投稿する</a>
     </div>
     <h1>proflile</h1>
-    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php if (isset($_SESSION['login_shop'])) {
-                                                                echo h($shop_img1);
-                                                              } ?>" width="100px">
+    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php
+                                                              echo h($shop_img);
+                                                              ?>" width="100px">
     <div class="row">
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Username</h3>
-          <p> <?php if (isset($_SESSION['login_shop'])) {
-                echo  $username;
-              }  ?></p>
+          <p> <?php
+              echo  $username;
+              ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
@@ -190,12 +191,10 @@ if (isset($_SESSION['login_shop'])) {
     <div class="col-lg-3 col-sm-6">
       <div class="about-text">
         <h3>お店のurl</h3>
-        <p><?php
-            echo $regular_holiday;
-            ?></p><?php
-                  echo $shop_url;
-
-                  ?>
+        <p>
+          <?php
+          echo $shop_url;
+          ?></p>
       </div>
     </div>
     <?php if (isset($_SESSION['login_shop'])) : ?>

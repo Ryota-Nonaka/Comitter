@@ -2,6 +2,7 @@
 
 namespace MyApp;
 
+require_once('config.php');
 class FacebookLogin
 {
   private $_fb;
@@ -11,7 +12,7 @@ class FacebookLogin
     $this->_fb = new \Facebook\Facebook([
       'app_id' => FB_APP_ID,
       'app_secret' => FB_APP_SECRET,
-      'default_graph_version' => DEFAULT_GRAPH_VERSION,
+      'default_graph_version' => DEFAULT_GRAPH_VERSION
     ]);
   }
 
@@ -31,22 +32,22 @@ class FacebookLogin
     // get access token
     try {
       $accessToken = $helper->getAccessToken();
-    } catch (\Facebook\Exception\FacebookResponseException $e) {
+    } catch (\Facebook\Exceptions\FacebookResponseException $e) {
       echo 'Response Error: ' . $e->getMessage();
       exit;
-    } catch (\Facebook\Exception\FacebookSDKException $e) {
+    } catch (\Facebook\Exceptions\FacebookSDKException $e) {
       echo 'SDK Error: ' . $e->getMessage();
       exit;
     }
 
     if (isset($accessToken)) {
       // save user
-      var_dump($accessToken);
+      // var_dump($accessToken);
 
       if (!$accessToken->isLongLived()) {
         try {
           $accessToken = $this->_fb->getOAuth2Client()->getLongLivedAccessToken($accessToken);
-        } catch (\Facebook\Exception\FacebookSDKException $e) {
+        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
           echo 'LongLived Access Token Error: ' . $e->getMessage();
           exit;
         }
@@ -58,10 +59,10 @@ class FacebookLogin
       $this->_save($accessToken);
       goHome();
     } elseif ($helper->getError()) {
-      goHome();
+      goHome(); //キャンセル処理
     } else {
       $permissions = ['email', 'public_profile', 'user_posts'];
-      $loginUrl = $helper->getLoginUrl(CALLBACK_URL, $permissions);
+      $loginUrl = $helper->getLoginUrl(FB_CALLBACK_URL, $permissions);
       header('Location: ' . $loginUrl);
     }
     exit;
@@ -72,16 +73,15 @@ class FacebookLogin
     // get user info
     $fb = new Facebook($accessToken);
     $userNode = $fb->getUserNode();
-    // var_dump($userNode); exit;
-
-    // save user
-    $user = new User();
-    $me = $user->save($accessToken, $userNode);
-    // var_dump($me);
+    // var_dump($userNode);
     // exit;
 
+    // save user
+    $user = new FBUser();
+    $login_fb = $user->save($accessToken, $userNode);
+  
     // login
     session_regenerate_id(true); // session hijack
-    $_SESSION['me'] = $me;
+    $_SESSION['login_fb'] = $login_fb;
   }
 }
