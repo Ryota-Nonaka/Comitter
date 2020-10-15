@@ -1,5 +1,5 @@
 <?php
-require 'config.php';
+require_once(__DIR__ . '/config.php');
 
 if (isset($_POST['shop_email']) && ($_POST['shop_password'])) {
 
@@ -47,9 +47,8 @@ if (isset($_POST['shop_email']) && ($_POST['shop_password'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
-  <link rel="stylesheet" href="src\css\signin.css" />
-  <title>signin page</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <link rel="stylesheet" href="src\css\signin.css">
 </head>
 
 <body class="container-fluid">
@@ -107,7 +106,7 @@ if (isset($_POST['shop_email']) && ($_POST['shop_password'])) {
           <div class="divider-form"></div>
 
           <p class="text-center">
-            You agree to the <strong>Terms & Conditions</strong>.
+            You agree to the <strong>Terms & Conditions</strong>
           </p>
 
           <button type="submit" class="btn-block btn btn-lg btn-primary">

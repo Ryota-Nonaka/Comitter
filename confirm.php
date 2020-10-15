@@ -1,15 +1,6 @@
 <?php
 
-// use PHPMailer\PHPMailer\PHPMailer;
-// use PHPMailer\PHPMailer\SMTP;
-// use PHPMailer\PHPMailer\Exception;
-// use PHPMailer\PHPMailer\OAuth;
-
-// use League\OAuth2\Client\Provider\Google;
-
-// require 'src\php_mailer\vendor\autoload.php';
-// mb_language("ja");
-// mb_internal_encoding("UTF-8");
+require_once(__DIR__ . '/config.php');
 
 
 
@@ -44,102 +35,12 @@ if (isset($_POST["submit"])) {
         $stmt->execute();
 
         header("Location:thanks.php");
-        exit;
     } catch (PDOException $e) {
         $errorMessage = 'データベースエラー';
         echo $e->getMessage();
     }
 }
 
-
-//     try {
-//         $mail = new PHPMailer(true);
-//         $mail->CharSet = "iso-2022-jp";
-//         $mail->Encoding = "7bit";
-//         $mail->setLanguage('ja', 'src/php_mailer/vendor/phpmailer/phpmailer/language/');
-
-//         $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-//         $mail->isSMTP();
-//         $mail->Host = 'smtp.gmail.com';
-//         $mail->SMTPAuth = true;
-//         $mail->SMTPSecure = 'ssl';
-//         $mail->Authtype = 'XOAUTH2';
-//         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-//         $mail->port = 465;
-
-//         $google_email = 'tdnblue@gmail.com';
-
-//         $clientId = '726992193287-i19lohgv0qt3e7608rj1be638ojvj3sb.apps.googleusercontent.com';
-//         $clientSecret = 'C3CXF5q86gR6QvJol9N2b_Tl';
-//         $refreshToken = ' 1//0enYUI79utwL6CgYIARAAGA4SNwF-L9IrNlZ3WkO-dEWW1h2RI4fggAZIM7UD2N5mmJnVkMFEsVEMFcc6tJdMHydFkMDPQj06b1I';
-
-//         $provider = new Google(
-//             [
-//                 'clientId' => $clientId,
-//                 'clientSecret' => $clientSecret,
-//             ]
-//         );
-
-//         $mail->setOAuth(
-//             new OAuth(
-//                 [
-//                     'provider' => $provider,
-//                     'clientId' => $clientId,
-//                     'clientSecret' => $clientSecret,
-//                     'refreshToken' => $refreshToken,
-//                     'userName' => $google_email,
-//                 ]
-//             )
-//         );
-
-//         $mail->setFrom('tdnblue@gmail.com', mb_encode_mimeheader('野中凌太'));
-//         $mail->addAddress($email, mb_encode_mimeheader($name));
-//         $mail->addReplyTo('tdnblue@gmail.com', mb_encode_mimeheader("お問い合わせ"));
-//         // $mail->addCC('foo@example.com'); 
-
-//         $mail->isHTML(true);
-//         $mail->Subject = mb_encode_mimeheader("［自動送信］お問い合わせ内容の確認");
-//         $mail->Body  = mb_convert_encoding(<<< EOM
-//         {$name} 様
-//         </br>
-//         お問い合わせありがとうございます。
-//         以下のお問い合わせ内容を、メールにて確認させていただきました。
-//         </br>
-//         ===================================================
-//         【 お名前 】 
-//         {$name}
-//         </br>
-//         【 ふりがな 】 
-//         {$furigana}
-//         </br>
-//         【 メール 】 
-//         {$email}
-//         </br>
-//         【 電話番号 】 
-//         {$tel}
-//         </br>
-//         【 性別 】 
-//         {$sex}
-//         </br>
-//         【 項目 】 
-//         {$item}
-//         </br>
-//         【 内容 】 
-//         {$content}
-//         ===================================================
-//         </br>
-//         内容を確認のうえ、回答させて頂きます。
-//         しばらくお待ちください。
-//         EOM, "JIS", "UTF-8");
-
-//         $mail->send();
-//         header("Location:thanks.php");
-//         exit;
-//     } catch (Exception $e) {
-//         //エラー（例外：Exception）が発生した場合
-//         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-//     }
-// }
 
 ?>
 
@@ -173,52 +74,30 @@ if (isset($_POST["submit"])) {
                         <a class="nav-link" href="confirm_input.php">お問い合わせ</a>
                     </li>
                 </ul>
-                <form class="form-inline mt-2 mt-md-0">
-
-                    <!-- 切り替えボタンの設定 -->
-                    <?php
-                    session_start();
-
-                    if (isset($_SESSION['login'])) {
-                        echo "ようこそ、" . $_SESSION['login'] . "さん！";
-                        echo "<a href='logout.php'>ログアウトはこちら。</a>";
-                    } else {
-                        echo  '<button type="button" class="btn btn-primary text-right" data-toggle="modal" data-target="#exampleModal">ログイン</button>';
-                    }
-                    ?>
-
-
-                </form>
-
+                <?php
+                if (isset($_SESSION['login'])) : ?>
+                    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+                    <a href="mypage_user.php?id=<?php echo ($_SESSION['id']); ?>">マイページへ</a>
+                <?php elseif (isset($_SESSION['me'])) : ?>
+                    <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['me']->username ?> </span>さん！</div>
+                    <a href="mypage_user.php?id=<?= $_SESSION['me_id'] ?>">マイページへ</a>
+                <?php elseif (isset($_SESSION['login_shop'])) : ?>
+                    <div class="text-light"> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
+                    <a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>">マイページへ</a>
+                <?php else : ?>
+                    <div class="row mr-5">
+                        <a href="signin_user.php">ユーザーログインはこちら</a>
+                    </div>
+                    <div class="row mr-3">
+                        <a href="signin_shop.php">店舗会員ログインはこちら</a>
+                    </div>
+                <?php endif; ?>
             </div>
         </nav>
 
     </header>
 
-    <!-- モーダルの設定 -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>ログイン</p>
-                </div>
-                <div class="modal-footer">
-                    <a class="btn btn-lg btn-primary nav-link" href="signin.php" role="button">ログイン画面</a>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
-                        </button>
-                        <!-- <button type="button" class="btn btn-primary">変更を保存</button> -->
-                    </div><!-- /.modal-footer -->
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div>
-    </div>
+
     </br>
     </br>
     </br>
@@ -242,63 +121,36 @@ if (isset($_POST["submit"])) {
                     <td><?php echo $name; ?></td>
                 </tr>
             </tbody>
-            <!-- <label class="col-md-5 border-bottom bg-light">お名前</label> -->
-            <!-- <p class="col-md-6 border-bottom"></p> -->
-            <!-- </div> -->
-            <!-- <div class="row">
-                <label class="col-md-5 border-bottom bg-light">ふりがな</label> -->
             <tbody>
                 <tr>
                     <th scope="row">ふりがな</th>
                     <td><?php echo $furigana; ?></td>
                 </tr>
             </tbody>
-            <!-- <p class="col-md-6 border-bottom"></p> -->
-            <!-- </div>
-            <div class="row">
-                <label class="col-md-5 border-bottom bg-light">メールアドレス</label> -->
             <tbody>
                 <tr>
                     <th scope="row">メールアドレス</th>
                     <td><?php echo $email; ?></td>
                 </tr>
             </tbody>
-            <!-- <p class="col-md-6 border-bottom"></p> -->
-            <!-- </div>
-            <div class="row">
-                <label class="col-md-5 border-bottom bg-light">電話番号</label> -->
             <tbody>
                 <tr>
                     <th scope="row">電話番号</th>
                     <td><?php echo $tel; ?></td>
                 </tr>
             </tbody>
-            <!-- <p class="col-md-6 border-bottom"></p>
-            </div>
-            <div class="row">
-                <label class="col-md-5 border-bottom bg-light">性別</label>
-                <p class="col-md-6 border-bottom"></p>
-            </div> -->
             <tbody>
                 <tr>
                     <th scope="row">性別</th>
                     <td><?php echo $sex ?></td>
                 </tr>
             </tbody>
-            <!-- <div class="row">
-                <label class="col-md-5 border-bottom bg-light">お問い合わせ項目</label>
-                <p class="col-md-6 border-bottom"></p>
-            </div> -->
             <tbody>
                 <tr>
                     <th scope="row">お問い合わせ項目</th>
                     <td><?php echo $item; ?></td>
                 </tr>
             </tbody>
-            <!-- <div>
-                <label class="col-md-5 border-bottom bg-light">お問い合わせ内容</label>
-                <p class="col-auto"></p>
-            </div> -->
             <tbody>
                 <tr>
                     <th scope="row">お問い合わせ内容</th>
@@ -306,7 +158,7 @@ if (isset($_POST["submit"])) {
                 </tr>
             </tbody>
         </table>
-        <input class="btn btn-primary" type="button" value="内容を修正する" onclick="history.back(-1)">
+        <input class="btn btn-secondary" type="button" value="内容を修正する" onclick="history.back(-1)">
         <button class="btn btn-primary" type="submit" name="submit">送信する</button>
     </form>
 

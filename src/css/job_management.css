@@ -1,0 +1,13 @@
+body {
+  background-color: #cccccc;
+  padding: 5px;
+}
+.about-contents {
+  background-color: #17a2b8;
+  padding: 40px;
+  color: #cccccc;
+}
+
+.about-contents img {
+  text-align: center;
+}

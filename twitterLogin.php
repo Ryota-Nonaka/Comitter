@@ -30,19 +30,18 @@ class TwitterLogin
     $conn = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
     $tokens = $conn->oauth('oauth/access_token', ['oauth_verifier' => $_GET['oauth_verifier']]);
 
-    // var_dump($tokens);
-
     $user = new User();
     $user->saveTokens($tokens);
-    $profile= new Twitter();
-    // echo "token saved";
-    // exit;
+
+
+
+
+
     session_regenerate_id(true); //session hijack
     $_SESSION['me'] = $user->getUser($tokens['user_id']);
+    
     unset($_SESSION['oauth_token']);
     unset($_SESSION['oauth_token_secret']);
-    $_SESSION['me_followers'] = $profile->getProfile($token['followers']);
-
     goHome();
   }
 

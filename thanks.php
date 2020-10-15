@@ -1,3 +1,11 @@
+<?php
+
+require_once(__DIR__ . '/config.php');
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -33,55 +41,41 @@
 							<a class="nav-link" href="confirm_input.php">お問い合わせ</a>
 						</li>
 					</ul>
-					<form class="form-inline mt-2 mt-md-0">
 
-						<!-- 切り替えボタンの設定 -->
-						<?php
-						session_start();
-
-						if (isset($_SESSION['login'])) {
-							echo "ようこそ、" . $_SESSION['login'] . "さん！";
-							echo "<a href='logout.php'>ログアウトはこちら。</a>";
-						} else {
-							echo  '<button type="button" class="btn btn-primary text-right" data-toggle="modal" data-target="#exampleModal">ログイン</button>';
-						}
-						?>
-
-
-					</form>
+					<?php
+					if (isset($_SESSION['login'])) : ?>
+						<div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+						<a href="mypage_user.php?id=<?php echo ($_SESSION['id']); ?>">マイページへ</a>
+					<?php elseif (isset($_SESSION['me'])) : ?>
+						<div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['me']->username ?> </span>さん！</div>
+						<a href="mypage_user.php?id=<?= $_SESSION['me_id'] ?>">マイページへ</a>
+					<?php elseif (isset($_SESSION['login_shop'])) : ?>
+						<div class="text-light"> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
+						<a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>">マイページへ</a>
+					<?php else : ?>
+						<div class="row mr-5">
+							<a href="signin_user.php">ユーザーログインはこちら</a>
+						</div>
+						<div class="row mr-3">
+							<a href="signin_shop.php">店舗会員ログインはこちら</a>
+						</div>
+					<?php endif; ?>
 
 				</div>
 			</nav>
 
 		</header>
 
-		<!-- モーダルの設定 -->
-		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel"></h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p>ログイン</p>
-					</div>
-					<div class="modal-footer">
-						<a class="btn btn-lg btn-primary nav-link" href="signin.php" role="button">ログイン画面</a>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
-							</button>
-							<!-- <button type="button" class="btn btn-primary">変更を保存</button> -->
-						</div><!-- /.modal-footer -->
-					</div><!-- /.modal-content -->
-				</div><!-- /.modal-dialog -->
-			</div>
+
+		</br>
+		</br>
+		</br>
+		<div class="mb3">
+			<a href="index.php">
+				<p class="breadcrumb-item">トップページに戻る</p>
+			</a>
 		</div>
-		</br>
-		</br>
-		</br>
+
 		<a href="confirm_input.php">
 			<p class="breadcrumb-item">お問い合わせに戻る</p>
 		</a>

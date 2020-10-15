@@ -54,9 +54,10 @@ if (isset($_SESSION['login_shop'])) {
 	</br>
 	</br>
 
-	<p><?= $signUpMessage ?></p>
-	<a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>">
-		<p class="breadcrumb-item">マイページへ</p>
+	<p>登録が完了しました。ようこそ、<span class="text-primary">
+			<?= $_SESSION['login_shop'] ?></span>さん</p>
+	<a href="mypage_shop.php?shop_name=<?= ($_SESSION['login_shop']); ?>">
+	<p class="breadcrumb-item">マイページへ</p>
 	</a>
 	<a href="index.php">
 		<p class="breadcrumb-item">トップページに戻る</p>

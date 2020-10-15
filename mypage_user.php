@@ -3,37 +3,91 @@
 require_once(__DIR__ . '/config.php');
 
 
-$name = $_GET['username'];
+$id = $_GET['id'];
+$userInfo = array();
+if (isset($_SESSION['me']) && isset($_SESSION['login'])) {
+  $twitterLogin = new MyApp\TwitterLogin();
+  $me = $_SESSION['me'];
+  $token = $_SESSION['token'];
+
+  $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
+  MyApp\Token::create();
+  $userInfo = $twitter->getProfile();
+  $followers = $userInfo->followers_count;
+  $friends = $userInfo->friends_count;
+  try {
+    $db = new Db();
+    $pdo = $db->dbConnect();
+    $stmt = $pdo->prepare(
+      "UPDATE userdata SET 
+       followers_count=:followers_count,
+        friends_count=:friends_count
+        WHERE id='$id'"
+    );
+    $stmt->bindParam(':followers_count', $followers, \PDO::PARAM_STR);
+    $stmt->bindParam(':friends_count', $friends, \PDO::PARAM_STR);
+    $stmt->execute();
+  } catch (Exception $e) {
+    echo 'エラーが発生しました。:' . $e->getMessage();
+  }
+} else if (isset($_SESSION['me'])) {
+  $twitterLogin = new MyApp\TwitterLogin();
+  $me = $_SESSION['me'];
+
+  $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
+  MyApp\Token::create();
+  $userInfo = $twitter->getProfile();
+  $tw_username = $userInfo->name;
+  $location = $userInfo->location;
+  $followers = $userInfo->followers_count;
+  $friends = $userInfo->friends_count;
+  $images =
+    $userInfo->profile_image_url;
+
+  try {
+    $db = new Db();
+    $pdo = $db->dbConnect();
+    $stmt = $pdo->prepare(
+      "UPDATE userdata SET username=:username,
+        pref=:pref,
+        img_path=:img_path,
+        followers_count=:followers_count,
+        friends_count=:friends_count
+        WHERE username IS NULL AND id='$id'"
+    );
+    $stmt->bindParam(':username', $tw_username, \PDO::PARAM_STR);
+    $stmt->bindParam(':pref', $location, \PDO::PARAM_STR);
+    $stmt->bindParam(':img_path', $images, \PDO::PARAM_STR);
+    $stmt->bindParam(':followers_count', $followers, \PDO::PARAM_STR);
+    $stmt->bindParam(':friends_count', $friends, \PDO::PARAM_STR);
+    $stmt->execute();
+  } catch (Exception $e) {
+    echo 'エラーが発生しました。:' . $e->getMessage();
+  }
+}
+
+
 $db = new Db();
 $pdo = $db->dbConnect();
-$sql = $pdo->prepare("SELECT * FROM userdata WHERE username='$name'");
+$sql = $pdo->prepare("SELECT * FROM userdata WHERE id='$id'");
 $sql->execute();
 foreach ($sql as $row) {
-  $id = $row['id'];
   $username = $row['username'];
   $location = $row['pref'];
   $introduction = $row['introduction'];
   $profile_img = $row['img_path'];
+  $followers = $row['followers_count'];
+  $friends = $row['friends_count'];
 }
 
 
 
 
-$twitterLogin = new MyApp\TwitterLogin();
-
-
-$me = $_SESSION['me'];
-$token = $_SESSION['token'];
-$twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
-
-$tweets = $twitter->getTweets();
-$userInfo = $twitter->getProfile();
 
 
 
 
 
-MyApp\Token::create();
 
 
 
@@ -43,7 +97,7 @@ MyApp\Token::create();
 try {
   $db = new Db();
   $pdo = $db->dbConnect();
-  $sql = "SELECT * from job where contacted_user_id='$id'";
+  $sql = "SELECT * from job_management where user_id='$id' and status=1";
 
   $jobs_info = array();
   $stmt = $pdo->query($sql);
@@ -57,6 +111,21 @@ try {
 }
 
 
+try {
+  $db = new Db();
+  $pdo = $db->dbConnect();
+  $sql = "SELECT * from job_management where user_id='$id' AND status=2";
+
+  $received_jobs = array();
+  $stmt = $pdo->query($sql);
+
+  foreach ($stmt as $row) {
+    array_push($received_jobs, $row);
+  }
+} catch (PDOException $e) {
+  $errorMessage = 'データベースエラー';
+  echo $e->getMessage();
+}
 
 
 
@@ -74,7 +143,7 @@ try {
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" href="src\css\mypage.css">
-  <title>MyPage</title>
+
 </head>
 
 <body>
@@ -93,70 +162,51 @@ try {
             <a class="nav-link" href="confirm_input.php">お問い合わせ</a>
           </li>
         </ul>
-        <form class="form-inline mt-2 mt-md-0">
-
-          <!-- 切り替えボタンの設定 -->
-          <?php
 
 
-          if (isset($_SESSION['login'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
-            <a href="mypage_user.php?username=<?php echo ($_SESSION['login']); ?>">マイページへ</a>
-          <?php elseif (isset($_SESSION['me'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $userInfo->name ?> </span>さん！</div>
-            <a href='mypage.php'>マイページへ</a>
-          <?php elseif (isset($_SESSION['login_shop'])) : ?>
-            <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login_shop'] ?> </span>さん！</div>
-            <a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']) ?>">マイページへ</a>
-          <?php endif; ?>
+        <?php
+        if (isset($_SESSION['login'])) : ?>
+          <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+          <a href="mypage_user.php?id=<?php echo ($_SESSION['id']); ?>">マイページへ</a>
+        <?php elseif (isset($_SESSION['me'])) : ?>
+          <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['me']->username ?> </span>さん！</div>
+          <a href="mypage_user.php?id=<?= $_SESSION['me_id'] ?>">マイページへ</a>
+        <?php elseif (isset($_SESSION['login_shop'])) : ?>
+          <div class="text-light"> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
+          <a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>">マイページへ</a>
+        <?php else : ?>
+          <div class="row mr-5">
+            <a href="signin_user.php">ユーザーログインはこちら</a>
+          </div>
+          <div class="row mr-3">
+            <a href="signin_shop.php">店舗会員ログインはこちら</a>
+          </div>
+        <?php endif; ?>
 
 
 
-        </form>
+
+
+
 
       </div>
     </nav>
 
   </header>
 
-  <!-- モーダルの設定 -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel"></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>ログイン</p>
-        </div>
-        <div class="modal-footer">
-          <a class="btn btn-lg btn-primary nav-link" href="signin.php" role="button">ログイン画面</a>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
-            </button>
 
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   </br>
   </br>
 
-  <div class="container-fluid mx-auto text-center about-contents" id="about-contents">
+  <div class="container-fluid m-0 text-center about-contents" id="about-contents">
     </br>
     <?php if (isset($_SESSION['login']) or isset($_SESSION['me'])) : ?>
       <div class="row justify-content-start">
-        <a class="btn btn-primary" href="profile_edit_img.php" role="button">プロフィール画像を変更する</a>
+        <a class="btn btn-primary" href="profile_edit_image_user.php" role="button">プロフィール画像を変更する</a>
       </div>
-    <?php endif; ?>
     </br>
-    <?php if (isset($_SESSION['login']) or isset($_SESSION['me'])) : ?>
       <div class="row justify-content-start">
-        <a class="btn btn-primary" href="profile_edit.php" role="button">プロフィール編集画面へ</a>
+        <a class="btn btn-primary" href="profile_edit_user.php" role="button">プロフィール編集画面へ</a>
       </div>
     <?php endif; ?>
     </br>
@@ -165,49 +215,58 @@ try {
         <a class="btn btn-primary" href="login.php" role="button">twitterアカウントと連携させる</a>
       </div>
     <?php endif; ?>
-
+    <?php
+    if (isset($_SESSION['login'])) : ?>
+      <div class="row justify-content-start mt-3">
+        <a class="btn btn-primary" href="job_management.php?id=<?php echo ($_SESSION['id']); ?>">申請中の依頼を確認</a>
+      </div>
+      <div class="row justify-content-start mt-3">
+        <a class="btn btn-primary" href="job_receiving.php?id=<?= $_SESSION['id'] ?>">受注中の依頼を確認</a>
+      </div>
+    <?php elseif (isset($_SESSION['me'])) : ?>
+      <div class="row justify-content-start mt-3">
+        <a class="btn btn-primary" href="job_management.php?id=<?= $_SESSION['me_id'] ?>">申請中の依頼を確認</a>
+      </div>
+      <div class="row justify-content-start mt-3">
+        <a class="btn btn-primary" href="job_receiving.php?id=<?= $_SESSION['me_id'] ?>">受注中の依頼を確認</a>
+      </div>
+    <?php endif; ?>
     <h1>proflile</h1>
-    <img class="img-thumbnail mt-5 mb-5 rounded-circle" src="<?php echo h($profile_img); ?>" width="100px">
+    <img class="img-thumbnail mt-5 mb-5 rounded-circle" width="1200" height="600" src="<?= h($profile_img); ?>" width="100px">
     <div class="row">
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Username</h3>
-          <p> <?php
-              echo $username;
+          <p> <?= $username;
               ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>Location</h3>
-          <p><?php
-              echo $location; ?></p>
+          <p><?= $location; ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>フォロワー数</h3>
-          <p><?php if (isset($_SESSION['me'])) {
-                echo $userInfo->followers_count;
-              } else echo '0'; ?></p>
+          <p><?= $followers; ?></p>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6">
         <div class="about-text">
           <h3>フォロー数</h3>
-          <p><?php if (isset($_SESSION['me'])) {
-                echo $userInfo->friends_count;
-              } else echo '0'; ?></p>
+          <p><?= $friends; ?></p>
         </div>
       </div>
     </div>
     </br>
     <div class="align-items-center">
       <h1>自己紹介</h1>
-      <textarea class="form-control col  align-items-center" id="Textarea" name="text" rows="3" placeholder="自分のキャラクターやPRポイントなどを詳細に書いてください"><?php if (isset($_SESSION['login'])) {
-                                                                                                                                              echo $introduction;
-                                                                                                                                            }
-                                                                                                                                            ?></textarea>
+      <textarea class="form-control col  align-items-center" id="Textarea" name="text" rows="3" placeholder="自分のキャラクターやPRポイントなどを詳細に書いてください" readonly><?php if (isset($_SESSION['login'])) {
+                                                                                                                                                        echo $introduction;
+                                                                                                                                                      }
+                                                                                                                                                      ?></textarea>
     </div>
     <?php if (isset($_SESSION['me'])) : ?>
       <form action="logout2.php" method="post" id="logout">
@@ -217,25 +276,6 @@ try {
     <?php else : ?>
       <a class="btn btn-danger" href="logout.php" value="logout">ログアウトする</a>
     <?php endif; ?>
-  </div>
-  <div class="container-fluid mx-auto" id="applying-order">
-    <h1>申請中の案件</h1>
-    <?php foreach ($jobs_info as $job_info) : ?>
-      <li class="media">
-        <img width="64" height="64" src="<?php echo $job_info['job_img_path']; ?>">
-
-        <div class="media-body mt-3">
-          <a class="mt-0 mb-1 font-weight-bold" href="job_contents.php?id=<?php echo $job_info['job_id']; ?>"><?php echo htmlspecialchars($job_info['job_title'], ENT_QUOTES, 'UTF-8'); ?></a>
-          <p>広告依頼内容簡単に記述、クリックで詳細画面へ</p>
-        </div>
-      </li>
-    <?php endforeach; ?>
-    </ul>
-  </div>
-
-  <div class="container-fluid mx-auto" id="receiving-order">
-    <h1>受注中の案件</h1>
-
   </div>
 
 

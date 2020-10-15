@@ -55,9 +55,10 @@ class User
     $stmt->bindValue(':tw_screen_name', $tokens['screen_name'], \PDO::PARAM_STR);
     $stmt->bindValue(':tw_access_token', $tokens['oauth_token'], \PDO::PARAM_STR);
     $stmt->bindValue(':tw_access_token_secret', $tokens['oauth_token_secret'], \PDO::PARAM_STR);
-
     try {
       $stmt->execute();
+      $_SESSION['me_id'] = $this->_db->lastInsertId('id');
+
     } catch (\PDOException $e) {
       throw new \Exception('Failed to insert user!');
     }
@@ -84,8 +85,11 @@ class User
     $stmt->bindValue(':tw_access_token_secret', $tokens['oauth_token_secret'], \PDO::PARAM_STR);
     $stmt->bindValue(':tw_user_id', (int)$tokens['user_id'], \PDO::PARAM_INT);
 
+
     try {
       $stmt->execute();
+      $id = $this->getUser($tokens['user_id']);
+      $_SESSION['me_id'] = $id->id;
     } catch (\PDOException $e) {
       throw new \Exception('Failed to update user!');
     }
