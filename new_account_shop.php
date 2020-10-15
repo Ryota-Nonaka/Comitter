@@ -4,7 +4,7 @@ require_once(__DIR__ . '/config.php');
 
 
 $errorMessage = "";
-$signUpMessage = "";
+
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -86,11 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $stmt->bindParam(':business_hour_close',  $business_hour_close, PDO::PARAM_STR);
       $stmt->bindParam(':regular_holiday', $regular_holiday, PDO::PARAM_STR);
       $stmt->bindParam(':shop_url', $shop_url, PDO::PARAM_STR);
-      header('Location:new_account_shop_image.php');
       $stmt->execute();
-      $userid = $pdo->lastinsertid();
-      $_SESSION['login_shop_id'] = $userid;
+      $_SESSION['login_shop_id'] = $pdo->lastInsertId();
       $_SESSION['login_shop'] = $shop_username;
+      header('Location:new_account_image_shop.php');
     } catch (PDOException $e) {
       $errorMessage = 'すでにそのメールアドレスは使用されています。';
       echo $e->getMessage();
@@ -120,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-  <!-- <header>
+  <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <a class="navbar-brand" href="index.php">食バズ(仮)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,42 +134,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a class="nav-link" href="confirm_input.php">お問い合わせ</a>
           </li>
         </ul>
-        <form class="form-inline mt-2 mt-md-0">
 
 
-          <!-- 切り替えボタンの設定 -->
+        <?php
+        if (isset($_SESSION['login'])) : ?>
+          <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['login'] ?> </span>さん！</div>
+          <a href="mypage_user.php?id=<?php echo ($_SESSION['id']); ?>">マイページへ</a>
+        <?php elseif (isset($_SESSION['me'])) : ?>
+          <div class=text-light> ようこそ、<span class="text-primary"> <?= $_SESSION['me']->username ?> </span>さん！</div>
+          <a href="mypage_user.php?id=<?= $_SESSION['me_id'] ?>">マイページへ</a>
+        <?php elseif (isset($_SESSION['login_shop'])) : ?>
+          <div class="text-light"> ようこそ、<span class="text-primary"><?= $_SESSION['login_shop'] ?> </span>さん！</div>
+          <a href="mypage_shop.php?shop_name=<?php echo ($_SESSION['login_shop']); ?>">マイページへ</a>
+        <?php else : ?>
+          <div class="row mr-5">
+            <a href="signin_user.php">ユーザーログインはこちら</a>
+          </div>
+          <div class="row mr-3">
+            <a href="signin_shop.php">店舗会員ログインはこちら</a>
+          </div>
+        <?php endif; ?>
 
 
-  </form>
 
-  </div>
-  </nav>
+
+
+
+
+      </div>
+    </nav>
 
   </header>
-  <!-- モーダルの設定 -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel"></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>ログイン</p>
-        </div>
-        <div class="modal-footer">
-          <a class="btn btn-lg btn-primary nav-link" href="signin.php" role="button">ログイン画面</a>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
-            </button>
-            <!-- <button type="button" class="btn btn-primary">変更を保存</button> -->
-          </div><!-- /.modal-footer -->
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-  </div>
+
+
 
   <!-- Page Content -->
 
@@ -178,12 +174,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form class="needs-validation" novalidate action="new_account_shop.php" method="post">
       <fieldset>
         <legend>新規登録フォーム</legend>
-        <div>
-          <font color="#ff0000"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES); ?></font>
-        </div>
-        <div>
-          <font color="#0000ff"><?php echo htmlspecialchars($signUpMessage, ENT_QUOTES); ?></font>
-        </div>
+        <?php if (isset($errorMessage)) : ?>
+          <div>
+            <font color="#ff0000"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES); ?></font>
+          </div>
+        <?php elseif (isset($signUpMessage)) : ?>
+          <div>
+            <font color="#0000ff"><?php echo htmlspecialchars($signUpMessage, ENT_QUOTES); ?></font>
+          </div>
+        <?php endif; ?>
         <!--店名-->
         <div class="mb-8">
           <div class="form-group row">
@@ -354,52 +353,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/ja.js" type="text/javascript"></script>
   <!-- 郵便番号から住所自動入力 -->
   <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
-  <!-- <script src="src\bootstrap-4-master\build\js\tempusdominus-bootstrap-4.min.js"></script>
-  <script type="text/javascript">
-    $(function() {
-      $('#datetimepicker1').datetimepicker({
-        dayViewHeaderFormat: 'YYYY年 MMMM',
-        tooltips: {
-          close: '閉じる',
-          selectMonth: '月を選択',
-          prevMonth: '前月',
-          nextMonth: '次月',
-          selectYear: '年を選択',
-          prevYear: '前年',
-          nextYear: '次年',
-          selectTime: '時間を選択',
-          selectDate: '日付を選択',
-          prevDecade: '前期間',
-          nextDecade: '次期間',
-          selectDecade: '期間を選択',
-          prevCentury: '前世紀',
-          nextCentury: '次世紀'
-        },
-        format: 'YYYY/MM/DD',
-        locale: 'ja',
-        showClose: true
-      });
-      $('#datetimepicker2').datetimepicker({
-        tooltips: {
-          close: '閉じる',
-          pickHour: '時間を取得',
-          incrementHour: '時間を増加',
-          decrementHour: '時間を減少',
-          pickMinute: '分を取得',
-          incrementMinute: '分を増加',
-          decrementMinute: '分を減少',
-          pickSecond: '秒を取得',
-          incrementSecond: '秒を増加',
-          decrementSecond: '秒を減少',
-          togglePeriod: '午前/午後切替',
-          selectTime: '時間を選択'
-        },
-        format: 'HH:mm',
-        locale: 'ja',
-        showClose: true
-      });
-    });
-  </script> -->
+
 </body>
 
 </html>

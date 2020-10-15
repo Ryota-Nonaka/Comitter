@@ -10,8 +10,8 @@ define('CALLBACK_URL', 'http://localhost/portforio/login.php');
 
 define('MAX_FILE_SIZE', 1 * 1024 * 1024); // 1MB
 define('THUMBNAIL_WIDTH', 400);
-define('IMAGES_DIR', __DIR__ . '\uploaded_userprofile');
-define('THUMBNAIL_DIR', __DIR__ . '\thumbs');
+define('IMAGES_DIR', 'uploaded_userprofile');
+define('THUMBNAIL_DIR', 'thumbs');
 
 define('DSN', 'mysql:host=localhost;dbname=application_management;charset=utf8mb4');
 define('DB_USERNAME', 'user');

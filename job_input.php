@@ -1,7 +1,6 @@
 <?php
 require_once(__DIR__ . '/config.php');
 $pref = array(
-  0 => '選択下さい。',
   1 => '北海道',
   2 => '青森県',
   3 => '岩手県',
@@ -52,6 +51,8 @@ $pref = array(
 );
 
 
+
+
 ?>
 <!doctype html>
 <html lang="ja">
@@ -63,7 +64,6 @@ $pref = array(
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
 
 </head>
 
@@ -108,99 +108,114 @@ $pref = array(
     </nav>
 
   </header>
-
-  <!-- モーダルの設定 -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel"></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>ログイン</p>
-        </div>
-        <div class="modal-footer">
-          <a class="btn btn-lg btn-primary nav-link" href="signin.php" role="button">ログイン画面</a>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
-            </button>
-
-          </div>
-        </div>
-      </div>
-    </div>
+  </br>
+  </br>
+  </br>
+  <div class="container border bg-info">
+    <h1>広告依頼フォーム</h1>
   </div>
-  </br>
-  </br>
-  </br>
-
-  <h1>広告依頼フォーム</h1>
 
   <form action="job.php" method="post" name="form" onsubmit="return validate()" enctype="multipart/form-data">
-    <div class="container-fluid col-md-6">
+    <div class="container border px-lg-5 pb-lg-5 pt-sm-2">
 
       <div class="form-group">
         <label>タイトル</label>
-        <input class="form-control" type="text" name="job_title" value="">
+        <input class="form-control" type="text" name="job_title" placeholder="PRしてほしいサービス名、メニュー名などを入力してください。" required>
       </div>
 
 
       <div class="form-group">
-        <label>紹介内容</label>
-        <textarea class="form-control" type=" text" name="job_body" placeholder="" value=""></textarea>
+        <label>募集内容</label>
+        <textarea class="form-control" type=" text" name="job_body" rows="5" placeholder="商品のPRポイント、求める人材などを簡単に入力してください。" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>報酬</label>
+        <textarea class="form-control" type=" text" name="reward" rows="5" placeholder="例)割引券プレゼント、など" required></textarea>
       </div>
 
 
 
+      <div class="form-group mt-3">
+        <label>イメージ画像</label>
+        <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo h(MAX_FILE_SIZE); ?>">
+        <div class="input-group row p-0 m-0">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="inputGroupFile" aria-describedby="inputGroupFileAddon" name="image" required>
+            <label class="custom-file-label" for="inputGroupFile03">イメージ画像を添付してください。</label>
+          </div>
+          <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary input-group-text" id="inputFileReset">取消</button>
+          </div>
+        </div>
+      </div>
+
       <!--性別-->
-      <div class="form-group row">
-        <label>　性別 </label>
-        <select class="form-control col-sm-3" id="exampleFormControlSelect1" name="sex">
+      <div class="input-group input-group-sm mb-3 row">
+        <div class="ml-3">
+          <label>性別</label>
+        </div>
+        <select class="form-control col-sm-3 ml-2" id="exampleFormControlSelect1" name="sex" required>
           <option value="男性">男性</option>
           <option value="女性">女性</option>
-          <option value="無回答">無回答</option>
+          <option value="両方">どちらも</option>
         </select>
         <!--/性別-->
 
         <!-- 年齢 -->
-        <label>　　年齢</label>
-        <select class="form-control col-sm-3" id="exampleFormControlSelect1" name=" age">
-          <?php for ($i = 0; $i <= 100; $i += 10) {
+        <div class="ml-3">
+          <label>年齢</label>
+        </div>
+        <select class="form-control col-sm-3  ml-2" id="exampleFormControlSelect1" name="age" required>
+          <?php for ($i = 10; $i <= 100; $i += 10) {
             echo '<option value=' . $i . '>' . $i . '</option>';
           } ?>
         </select>　代
       </div>
       <!-- 年齢 -->
 
+
+
+
+
+
       <!--エリア-->
-      <div class="form-group">
-        <label>エリア</label>
-        <select class="form-control col-mb-6" name="pref">
-          <?php foreach ($pref as $value) { ?>
-            <option value="<?php echo $value ?>"> <?php echo $value; ?></option>
-          <?php } ?>
+      <div class="input-group input-group-sm col-sm-XX row">
+        <div class="ml-3">
+          <label>エリア</label>
+        </div>
+        <select class="form-control ml-2 col-sm-3" name="area" required>
+          <?php foreach ($pref as $value) : ?>
+            <option value="<?= $value ?>"> <?= $value; ?></option>
+          <?php endforeach; ?>
+        </select>
+        <!--/エリア-->
+
+        <!--条件-->
+        <div class="ml-3">
+          <label>必要いいね数</label>
+        </div>
+        <select class="form-control col-sm-3 ml-3" name="needs_like" required>
+          <?php
+          $i = 0;
+          if ($i <= 100) {
+            for ($i = 10; $i <= 100; $i += 10) {
+              echo '<option value=' . $i . '>' . $i . '</option>';
+            }
+          }
+          if ($i >= 100) {
+            for ($i = 200; $i <= 1000; $i += 100) {
+              echo '<option value=' . $i . '>' . $i . '</option>';
+            }
+          } ?>
         </select>
       </div>
-      <!--/エリア-->
-
-
-      <div class="form-group">
-        <label>イメージ画像</label>
-        <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo h(MAX_FILE_SIZE); ?>">
-        <div class="input-group row">
-          <div class="custom-file col-mb-6">
-            <input type="file" class="custom-file-input" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03" name="image">
-            <label class="custom-file-label" for="inputGroupFile03">ファイルを選択</label>
-            <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
-          </div>
-        </div>
-      </div>
-      <button class="btn btn-primary" type="submit">確認画面へ</button>
-    </div>
+      <button class="btn btn-primary mt-5" type="submit">確認画面へ</button>
   </form>
+  </div>
+  <!--条件-->
+
+
 
 
   <!-- Optional JavaScript -->
@@ -208,6 +223,24 @@ $pref = array(
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+  <script>
+    bsCustomFileInput.init();
+
+    document.getElementById('inputFileReset').addEventListener('click', function() {
+
+      bsCustomFileInput.destroy();
+
+      var elem = document.getElementById('inputFile');
+      elem.value = '';
+      var clone = elem.cloneNode(false);
+      elem.parentNode.replaceChild(clone, elem);
+
+      bsCustomFileInput.init();
+
+    });
+  </script>
+
 </body>
 
 </html>

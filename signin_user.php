@@ -1,5 +1,5 @@
 <?php
-require 'config.php';
+require_once(__DIR__ . '\config.php');
 
 if (isset($_POST['email']) && ($_POST['password'])) {
 
@@ -48,9 +48,8 @@ if (isset($_POST['email']) && ($_POST['password'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   <link rel="stylesheet" href="src\css\signin.css" />
-  <title>signin page</title>
 </head>
 
 <body class="container-fluid">
@@ -80,7 +79,6 @@ if (isset($_POST['email']) && ($_POST['password'])) {
           <a class="btn btn-lg btn-block btn-facebook" id="twitter-button" href="#">
             Facebookアカウントでログイン</a>
         </div>
-
         <div class="input-group" id="twitter-button" data-provider="twitter">
           <span class="input-group-addon addon-twitter">
             <i class="fa fa-fw fa-2x fa-twitter fa-fw"></i>
@@ -122,7 +120,6 @@ if (isset($_POST['email']) && ($_POST['password'])) {
       </div>
     </div>
   </div>
-
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

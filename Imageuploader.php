@@ -34,8 +34,8 @@ class ImageUploader
       exit;
     }
     // redirect
-  //   header('Location:http://localhost/portforio/profile_edit_image.php');
-  //   exit;
+    //   header('Location:http://localhost/portforio/profile_edit_image.php');
+    //   exit;
   }
 
   public function getResults()

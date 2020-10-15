@@ -11,7 +11,7 @@ $signUpMessage = "";
 $row = array();
 //エラーカウントの変数を書く
 //条件式の中にエラーカウントを足していき最後にエラーカウント0ならば認証処理する。
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if (isset($_POST['submit'])) {
   if (empty($_POST['username'])) {
     $errorMessage = 'ユーザーIDが未入力です。';
   } else if (empty($_POST['email'])) {
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
       $db = new Db();
       $pdo = $db->dbConnect();
-      $stmt = $pdo->prepare("INSERT INTO userdata(username,email,pass,zip,pref,addr,introduction, sex,age) VALUES (:username, :email, :pass, :zip, :pref, :addr,:introduction, :sex, :age)");
+      $stmt = $pdo->prepare("INSERT INTO userdata(username,email,pass,zip,pref,addr,introduction,sex,age) VALUES (:username, :email,:pass,:zip,:pref,:addr,:introduction,:sex,:age)");
       $stmt->bindParam(':username', $user, PDO::PARAM_STR);
       $stmt->bindParam(':email', $mail, PDO::PARAM_STR);
       $stmt->bindParam(':pass', $pass, PDO::PARAM_STR);
@@ -66,10 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $stmt->bindParam(':introduction', $introduction, PDO::PARAM_STR);
       $stmt->bindParam(':sex', $sex, PDO::PARAM_STR);
       $stmt->bindParam(':age', $age, PDO::PARAM_STR);
-      header('Location:created_account_user.php');
       $stmt->execute();
+      $_SESSION['id'] = $pdo->lastInsertId('id');
 
-      $_SESSION['login_shop'] = $shop_username;
+      $_SESSION['login'] = $user;
+      header('Location:new_account_image_user.php');
     } catch (PDOException $e) {
       $errorMessage = 'すでにそのメールアドレスは使用されています。';
       echo $e->getMessage();
@@ -100,9 +101,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-  <!-- <header>
+  <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="index.php">TRY-GER</a>
+      <a class="navbar-brand" href="index.php">食バズ</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -115,57 +116,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a class="nav-link" href="confirm_input.php">お問い合わせ</a>
           </li>
         </ul>
-        <form class="form-inline mt-2 mt-md-0">
-
-          <!-- 切り替えボタンの設定 -->
-
-
-  <!-- </form>
 
       </div>
     </nav>
 
-  </header> -->
+  </header>
 
 
-  <!-- モーダルの設定 -->
-  <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel"></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>ログイン</p>
-        </div>
-        <div class="modal-footer">
-          <a class="btn btn-lg btn-primary nav-link" href="signin.php" role="button">ログイン画面</a>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる
-            </button>
-            
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
 
   <!-- Page Content -->
 
   <div class="container mt-5 p-lg-5 bg-light">
-    <form class="needs-validation" novalidate action="new_account_user.php" enctype="multipart/form-data" method="post">
+    <form class="needs-validation" novalidate action="new_account_user.php" method="post">
       <fieldset>
         <legend>新規登録フォーム</legend>
-        <div>
-          <font color="#ff0000"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES); ?></font>
-        </div>
-        <div>
-          <font color="#0000ff"><?php echo htmlspecialchars($signUpMessage, ENT_QUOTES); ?></font>
-        </div>
-
+        <?php if (isset($errorMessage)) : ?>
+          <div>
+            <font color="#ff0000"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES); ?></font>
+          </div>
+        <?php elseif (isset($signUpMessage)) : ?>
+          <div>
+            <font color="#0000ff"><?php echo htmlspecialchars($signUpMessage, ENT_QUOTES); ?></font>
+          </div>
+        <?php endif; ?>
         <!--ユーザー名-->
         <div class="mb-8">
           <div class="form-group row">
@@ -231,40 +204,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!--性別-->
 
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="sex" id="male" value="男性" checked>
-          <label class="form-check-label" for="exampleRadios1">
-            男性
-          </label>
+
+
+        <div class="input-group input-group-sm mb-3 row">
+          <div class="ml-3">
+            <label>性別</label>
+          </div>
+          <select class="form-control col-sm-3 ml-2" id="exampleFormControlSelect1" name="sex" required>
+            <option value="男性">男性</option>
+            <option value="女性">女性</option>
+            <option value="両方">どちらも</option>
+          </select>
+          <!--/性別-->
+          </br>
+          <!-- 年齢 -->
+          <div class="ml-3">
+            <label>年齢</label>
+          </div>
+          <select class="form-control ml-2 col-sm-3" name="age">
+            <?php for ($i = 0; $i < 100; $i += 1) {
+              echo '<option value=' . $i . '>' . $i . '</option>';
+            } ?>
+          </select>　歳
+
         </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="sex" id="female" value="女性">
-          <label class="form-check-label" for="exampleRadios2">
-            女性
-          </label>
-        </div>
-        <!--/性別-->
-        </br>
-        <!-- 年齢 -->
-        <select name="age">
-          <?php for ($i = 0; $i < 100; $i += 1) {
-            echo '<option value=' . $i . '>' . $i . '</option>';
-          } ?>
-        </select>　歳
         <!-- 年齢 -->
 
         </br>
         <!--自己紹介欄-->
-        <div class="form-group pb-3">
+
+        <div class="form-group">
           <label for="Textarea">自己紹介欄</label>
-          <textarea class="form-control" id="Textarea" name="introduction" rows="3" placeholder="自分のキャラクターや自己PRを記入してください。" value="<?php if (!empty($_POST["text"])) {
+          <textarea class="form-control" id="Textarea" name="introduction" rows="5" placeholder="自分のキャラクターや自己PRを記入してください。" value="<?php if (!empty($_POST["text"])) {
                                                                                                                                     echo htmlspecialchars($_POST["text"], ENT_QUOTES);
                                                                                                                                   } ?>"></textarea>
         </div>
         <!--/自己紹介欄-->
 
         <!--利用規約-->
-        <!-- <div class="form-group pb-3">
+        <div class="form-group pb-3">
           <div class="custom-control custom-checkbox">
             <input class="custom-control-input" type="checkbox" value="" id="invalidCheck" required />
             <label class="custom-control-label" for="invalidCheck">
@@ -274,14 +252,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               提出する前に同意する必要があります
             </div>
           </div>
-        </div> -->
+        </div>
         <!--/利用規約-->
 
         <!--ボタンブロック-->
 
         <div class="form-group row">
           <div class="col-sm-12">
-            <button type="submit" class="btn btn-primary btn-block" name="submit" value="新規登録">
+            <button type="submit" class="btn btn-primary btn-block" name="submit">
               新規登録
             </button>
           </div>
