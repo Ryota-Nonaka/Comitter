@@ -142,8 +142,8 @@ if (isset($_GET['keyword']) && isset($_GET['area'])) {
       </form>
     </div>
     </br>
-
-    <div class="container-fluid">
+カード横並びで表示させる。
+    <div class="container">
       <h1 class="text-dark ml-3">最近投稿された依頼</h1>
       <?php if ($count > 0) : ?>
         <ul class="list-group list-group-horizontal">

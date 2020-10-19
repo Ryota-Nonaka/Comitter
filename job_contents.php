@@ -1,5 +1,4 @@
 <?php
-
 require_once(__DIR__ . '/config.php');
 
 
@@ -191,6 +190,10 @@ if (isset($_POST['reject'])) {
     </nav>
 
   </header>
+  来店予約やり取りの機能を追加する。
+ジョブNo.不要
+依頼内容と店舗情報を横並びにする。
+ボタンを見やすくする。
   </br>
   </br>
   </br>

@@ -4,23 +4,22 @@ require_once(__DIR__ . '/config.php');
 
 
 
-
 $twitterLogin = new MyApp\TwitterLogin();
 $me = $_SESSION['me'];
 $token = $_SESSION['token'];
-
+// $accessToken = $me->tw_access_token;
+// $accessTokenSecret = $me->tw_access_token_secret;
 $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
 $tweets = array();
 $tweet = array();
-
 $tweets = $twitter->getTweets();
 $tweet_array = array();
+
 foreach ($tweets as $tweet) {
   $tweet_array[] = json_decode(json_encode($tweet), true);
   $results = array();
   $result = array();
 }
-
 
 
 if (isset($_GET['search_tweets'])) {

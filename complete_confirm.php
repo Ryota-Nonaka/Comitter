@@ -90,7 +90,7 @@ if ($count > 0) {
       $pdo = $db->dbConnect();
       $stmt = $pdo->prepare("DELETE FROM job_management WHERE job_id='$job_id' AND user_id='$user_id'");
       $stmt->execute();
-      header('Location:job_complete_shop.php');
+      // header('Location:job_complete_shop.php?id=' . $id);
     } catch (PDOException $e) {
       echo $e->getMessage();
     }
@@ -179,6 +179,7 @@ if ($count > 0) {
               </p>
               <p>ユーザーのマイページ:<a href="mypage_user.php?id=<?= $result['user_id'] ?>"><?= $result['username'] ?></a></p>
               <form method="post" action="complete_confirm.php?id=<?= $id; ?>">
+
                 <?= $oembed->html; ?>
                 <button type="submit" class="btn btn-primary" name="complete">承認する</button>
               </form>

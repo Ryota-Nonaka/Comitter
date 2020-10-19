@@ -15,17 +15,17 @@ if (isset($_SESSION['login'])) {
     $images = $row['img_path'];
   }
 }
-if (isset($_SESSION['me'])) {
-  $db = new Db();
-  $pdo = $db->dbConnect();
-  $id = $_SESSION['me_id'];
-  $sql = "SELECT * FROM userdata WHERE id='$id'";
-  $stmt = $pdo->query($sql);
-  foreach ($stmt as $row) {
-    $username = $row['username'];
-    $images = $row['img_path'];
-  }
-}
+// if (isset($_SESSION['me'])) {
+//   $db = new Db();
+//   $pdo = $db->dbConnect();
+//   $id = $_SESSION['me_id'];
+//   $sql = "SELECT * FROM userdata WHERE id='$id'";
+//   $stmt = $pdo->query($sql);
+//   foreach ($stmt as $row) {
+//     $username = $row['username'];
+//     $images = $row['img_path'];
+//   }
+// }
 
 
 if (!function_exists('imagecreatetruecolor')) {

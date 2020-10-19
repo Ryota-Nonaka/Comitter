@@ -150,7 +150,7 @@ $to = $offset + COMMENTS_PER_PAGE < $total ? ($offset + COMMENTS_PER_PAGE)
 
   </header>
 
-
+横幅をcol2:mg-8位の比率で作る
   </br>
   </br>
   </br>

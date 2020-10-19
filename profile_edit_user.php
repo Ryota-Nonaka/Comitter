@@ -15,18 +15,7 @@ if (isset($_SESSION['login'])) {
     $introduction = $row['introduction'];
   }
 }
-if (isset($_SESSION['me'])) {
-  $db = new Db();
-  $pdo = $db->dbConnect();
-  $id = $_SESSION['me_id'];
-  $sql = "SELECT * FROM userdata WHERE id='$id'";
-  $stmt = $pdo->query($sql);
-  foreach ($stmt as $row) {
-    $username = $row['username'];
-    $location = $row['pref'];
-    $introduction = $row['introduction'];
-  }
-}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $success = null;

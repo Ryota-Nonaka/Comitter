@@ -91,8 +91,9 @@ list($success, $error) = $uploader->getResults();
 
     <form action="" method="post" enctype="multipart/form-data">
       <div class="form-group mt-3">
-        <div class="row mt-5">
-          <h1 class="mb-3">プロフィール画像を選択してください。</h1>
+        </br>
+        <div class="row mt-lg-5">
+          <h1>プロフィール画像を選択してください。</h1>
         </div>
         <label>プロフィール画像</label>
         <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo h(MAX_FILE_SIZE); ?>">

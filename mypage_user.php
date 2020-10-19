@@ -8,8 +8,6 @@ $userInfo = array();
 if (isset($_SESSION['me']) && isset($_SESSION['login'])) {
   $twitterLogin = new MyApp\TwitterLogin();
   $me = $_SESSION['me'];
-  $token = $_SESSION['token'];
-
   $twitter = new MyApp\Twitter($me->tw_access_token, $me->tw_access_token_secret);
   MyApp\Token::create();
   $userInfo = $twitter->getProfile();
@@ -195,6 +193,7 @@ try {
   </header>
 
 
+
   </br>
   </br>
 
@@ -204,7 +203,7 @@ try {
       <div class="row justify-content-start">
         <a class="btn btn-primary" href="profile_edit_image_user.php" role="button">プロフィール画像を変更する</a>
       </div>
-    </br>
+      </br>
       <div class="row justify-content-start">
         <a class="btn btn-primary" href="profile_edit_user.php" role="button">プロフィール編集画面へ</a>
       </div>
@@ -214,6 +213,7 @@ try {
       <div class="row justify-content-start">
         <a class="btn btn-primary" href="login.php" role="button">twitterアカウントと連携させる</a>
       </div>
+      </br>
     <?php endif; ?>
     <?php
     if (isset($_SESSION['login'])) : ?>

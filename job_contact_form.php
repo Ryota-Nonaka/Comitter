@@ -60,7 +60,6 @@ if (isset($_POST['regist'])) {
 
 
     $stmt->execute();
-    $stmt->debugDumpParams();
     $_SESSION['job_id'] = $job_id;
     $_SESSION['shop_id'] = $shop_id;
     header('Location:job_contact_success.php');
